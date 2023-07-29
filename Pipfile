@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 jikanpy-v4 = "*"
 xmltodict = "*"
+jupyter = "*"
 
 [dev-packages]
 
