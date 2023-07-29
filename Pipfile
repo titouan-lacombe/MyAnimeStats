@@ -8,6 +8,7 @@ xmltodict = "*"
 jupyter = "*"
 tdqm = "*"
 jikanpy-v4 = "*"
+pandas = "*"
 
 [dev-packages]
 
