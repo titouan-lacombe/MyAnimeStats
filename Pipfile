@@ -9,6 +9,7 @@ jupyter = "*"
 tdqm = "*"
 jikanpy-v4 = "*"
 pandas = "*"
+unidecode = "*"
 
 [dev-packages]
 
