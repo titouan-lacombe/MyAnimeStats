@@ -12,6 +12,12 @@ Install the virtual environment using pipenv:
 pipenv install
 ```
 
+If you don't have pipenv, you can install it with pip:
+
+```sh
+pip install pipenv
+```
+
 Then run the notebook you want in the virtual environment.
 
 For example, to run the web notebook:
