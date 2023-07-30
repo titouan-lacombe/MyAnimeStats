@@ -10,6 +10,8 @@ tdqm = "*"
 jikanpy-v4 = "*"
 pandas = "*"
 unidecode = "*"
+matplotlib = "*"
+seaborn = "*"
 
 [dev-packages]
 
