@@ -29,4 +29,6 @@ Notebooks files:
 
 - import.ipynb imports your data and completes it with data from the [Jikan API](https://jikan.moe/).
 - franchises.ipynb regroups your anime by franchise.
-- stats.ipynb displays some stats about your franchises.
+- stats.ipynb displays stats about your franchises.
+
+So in most use cases, just run: import -> franchises -> stats
