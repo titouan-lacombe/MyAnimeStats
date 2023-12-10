@@ -4,13 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-xmltodict = "*"
 jupyter = "*"
-tdqm = "*"
 jikanpy-v4 = "*"
-pandas = "*"
-unidecode = "*"
+xmltodict = "*"
+dicttoxml2 = "*"
 matplotlib = "*"
+unidecode = "*"
+tdqm = "*"
+pandas = "*"
 seaborn = "*"
 scikit-learn = "*"
 
