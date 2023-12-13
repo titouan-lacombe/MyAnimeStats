@@ -1,12 +1,7 @@
-import json, time, copy
+import copy
 from tqdm import tqdm
-from jikanpy import AioJikan
-from pathlib import Path
 
-jikan_sleep_time = 1.1
-
-data = Path('data')
-cache = data / '.cache'
+from .cache import anime_cache
 
 # MAL data
 anime_key_map = {
@@ -94,34 +89,11 @@ def complete_anime(anime: dict, details: dict):
 
 	return complete_anime
 
-async def fetch_and_complete_anime(anime: dict, aio_jikan: AioJikan):
-	anime_id = int(anime['series_animedb_id'])
-	# print(f"Fetching details for {anime['series_title']} ({anime_id})")
-	
-	cache_file = cache / "anime" / f"{anime_id}.json"
-	if cache_file.exists():
-		# print("Using cached data")
-		response = json.load(cache_file.open())
-		return complete_anime(anime, response["data"])
-
-	# print("Fetching data")
-	response = await aio_jikan.anime(anime_id)
-	complete = complete_anime(anime, response["data"])
-	time.sleep(jikan_sleep_time)  # Sleep to avoid rate limiting
-
-	# If anime finished airing, cache the data
-	if complete['status'] == 'Finished Airing':
-		# print("Caching data")
-		cache_file.parent.mkdir(parents=True, exist_ok=True)
-		json.dump(response, cache_file.open('w'))
-	
-	return complete
-
 # Complete the animelist with data from Jikan API
-async def complete_animes(animes: list, aio_jikan: AioJikan):
+async def complete_animes(animes: list):
 	completed = []
 	for anime in tqdm(animes):
-		result = await fetch_and_complete_anime(anime, aio_jikan)
-		completed.append(result)
+		response = await anime_cache.get(id=int(anime['series_animedb_id']))
+		completed.append(complete_anime(anime, response))
 
 	return completed

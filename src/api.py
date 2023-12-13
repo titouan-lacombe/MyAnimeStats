@@ -1,8 +1,7 @@
 import aiohttp
-from jikanpy import AioJikan
 
 from .load_list import load_web_list, load_xml_list
-from .import_list import complete_animes
+from .complete_anime import complete_animes
 from .franchises import get_franchises
 from .schedule import get_schedule
 from .staff import get_staff
@@ -24,13 +23,11 @@ async def my_anime_stats(export_file=None, username=None):
 	
 	# Complete anime data
 	print("Completing animes data with data from MAL")
-	async with AioJikan() as aio_jikan:
-		animes = await complete_animes(animes, aio_jikan)
+	animes = await complete_animes(animes)
 	
 	# Get staff
 	print("Getting staff data from MAL")
-	async with AioJikan() as aio_jikan:
-		staff = await get_staff(animes, aio_jikan)
+	staff = await get_staff(animes)
 
 	# Compute franchises
 	print("Computing franchises")

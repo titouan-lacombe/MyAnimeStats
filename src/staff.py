@@ -1,54 +1,11 @@
-import json, time
+import pprint
 from datetime import datetime
 from tqdm import tqdm
-from jikanpy import AioJikan
-from pathlib import Path
 
-data = Path('data')
-cache = data / '.cache'
-
-async def fetch_staff(anime, jikan: AioJikan):
-	anime_id = anime['mal_id']
-
-	cache_file = cache / "anime_staff" / f"{anime_id}.json"
-	if cache_file.exists():
-		# print("Using cached data")
-		response = json.load(cache_file.open())
-		return response
-
-	response = await jikan.anime(anime_id, extension='staff')
-	time.sleep(1.1)  # Sleep to avoid rate limiting
-	
-	# If anime finished airing, cache the data
-	if anime['status'] == 'Finished Airing':
-		# print("Caching data")
-		cache_file.parent.mkdir(parents=True, exist_ok=True)
-		json.dump(response, cache_file.open('w'))
-
-	return response
-
-async def fetch_characters(anime, jikan: AioJikan):
-	anime_id = anime['mal_id']
-
-	cached = cache / "anime_characters" / f"{anime_id}.json"
-	if cached.exists():
-		# print("Using cached data")
-		response = json.load(cached.open())
-		return response
-	
-	response = await jikan.anime(anime_id, extension='characters')
-	time.sleep(1.1)  # Sleep to avoid rate limiting
-
-	# If anime finished airing, cache the data
-	if anime['status'] == 'Finished Airing':
-		# print("Caching data")
-		cached.parent.mkdir(parents=True, exist_ok=True)
-		json.dump(response, cached.open('w'))
-
-	return response
+from .cache import staff_cache, character_cache
 
 # Recover all people that worked on watched animes
-async def get_staff(animes, aio_jikan, score_min=0):
+async def get_staff(animes, score_min=0):
 	# Filter animes by status and score
 	animes = {anime["mal_id"]: anime for anime in animes if anime["my_status"] != "Plan to Watch" and anime["my_score"] >= score_min}
 
@@ -66,13 +23,14 @@ async def get_staff(animes, aio_jikan, score_min=0):
 		animes[anime_id].extend(positions)
 
 	for anime in tqdm(animes.values()):
-		staff = await fetch_staff(anime, aio_jikan)
-		for staff_member in staff['data']:
+		staff = await staff_cache.get(anime=anime)
+ 
+		for staff_member in staff:
 			# TODO position blacklist?
 			add_people(staff_member['person'], anime['mal_id'], staff_member['positions'])
 
-		characters = await fetch_characters(anime, aio_jikan)
-		for character in characters['data']:
+		characters = await character_cache.get(anime=anime)
+		for character in characters:
 			for voice_actor in character['voice_actors']:
 				if voice_actor['language'] != 'Japanese':
 					continue
