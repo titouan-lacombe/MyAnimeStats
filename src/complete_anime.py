@@ -1,5 +1,6 @@
 import copy
 from tqdm import tqdm
+from datetime import datetime
 
 from .cache import anime_cache
 
@@ -72,6 +73,17 @@ def clean_fields(data: dict, fields: dict):
 		elif fields[field] is not None and data[field] is not None:
 			data[field] = fields[field](data[field])
 
+def parse_field(data: dict, field: str, parser):
+	fields = field.split(".")
+
+	while len(fields) > 1:
+		data = data[fields.pop(0)]
+	
+	field = fields.pop(0)
+	if data[field] is None:
+		return
+	data[field] = parser(data[field])
+
 # Complete anime entry with data from Jikan API
 def complete_anime(anime: dict, details: dict):
 	# Define key map for necessary fields and their corresponding types
@@ -82,6 +94,10 @@ def complete_anime(anime: dict, details: dict):
 
 	# Create complete anime object
 	complete_anime = {**details_copy, **anime_copy}
+
+	# Parse some fields
+	parse_field(complete_anime, "aired.from", lambda date: datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z'))
+	parse_field(complete_anime, "aired.to", lambda date: datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z'))
 
 	# Minimum one episode
 	if complete_anime['episodes'] is None:
