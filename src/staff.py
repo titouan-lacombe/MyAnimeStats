@@ -70,4 +70,4 @@ def print_staff(peoples, animes):
 			date = datetime.strptime(work["anime"]["aired"]["from"], '%Y-%m-%dT%H:%M:%S%z')
 			anime = work["anime"]
 			anime_title = anime['title_english'] or anime['title']
-			print(f"[{date.year}] {anime_title}: {', '.join(work["positions"])}")
+			print(f"[{date.year}] {anime_title}: {', '.join(work['positions'])}")
