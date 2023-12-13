@@ -1,3 +1,4 @@
+from urllib.parse import quote
 from datetime import datetime
 from tqdm import tqdm
 
@@ -62,7 +63,8 @@ def print_staff(peoples, animes):
 		works.sort(key=lambda work: work["anime"]["aired"]["from"])
 
 		# TODO Don't show following works if same VA on same character?
-		showreel_url = f"https://www.youtube.com/results?search_query={people['name']}"
+		url_name = quote(people['name'])
+		showreel_url = f"https://www.youtube.com/results?search_query={url_name}"
 		print(f"\n{people['name']} ({len(works)} works) - {showreel_url}")
 		for work in works:
 			date = datetime.strptime(work["anime"]["aired"]["from"], '%Y-%m-%dT%H:%M:%S%z')

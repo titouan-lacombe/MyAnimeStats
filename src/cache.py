@@ -1,11 +1,12 @@
-import json, asyncio, pprint
+import json, asyncio
+from datetime import datetime
 from jikanpy import AioJikan
 from pathlib import Path
 
 JIKAN_SLEEP_TIME = 1.1
 
 class Cache:
-	def __init__(self, cache_dir: Path, get_data, is_expired=lambda _: False):
+	def __init__(self, cache_dir: Path, get_data, is_expired=lambda *args, **kwargs: False):
 		self.cache_dir: Path = cache_dir
 		self.get_data = get_data
 		self.is_expired = is_expired
@@ -16,7 +17,7 @@ class Cache:
 		if cache_file.exists():
 			# print(f"Using cached data for {id}")
 			cached = json.load(cache_file.open())
-			if not self.is_expired(cached):
+			if not self.is_expired(cached, *args, **kwargs):
 				return cached
 		
 		data, should_cache = await self.get_data(id, *args, **kwargs)
@@ -38,7 +39,21 @@ class AnimeCache(Cache):
 		self.jikan = jikan
 		self.extension = extension
 		subdir = "anime" if self.extension is None else f"anime_{self.extension}"
-		super().__init__(cache_dir / subdir, self.get_data)
+		super().__init__(cache_dir / subdir, self.get_data, self.is_expired)
+
+	def is_expired(self, data, anime):
+		if anime is None:
+			anime = data["data"]
+
+		if anime["status"] == "Finished Airing":
+			return False
+
+		# If younger than 24h
+		date = datetime.strptime(data["headers"]["Date"], "%a, %d %b %Y %H:%M:%S %Z")
+		if (datetime.now() - date).days == 0:
+			return False
+
+		return True
 
 	async def get_data(self, id=None, anime=None):
 		# print(f"Getting data for anime {id} with extension {self.extension}")
@@ -47,8 +62,7 @@ class AnimeCache(Cache):
 		if anime is None:
 			anime = response["data"]
 
-		# TODO caching airing animes for 24h
-		return response, anime['status'] == 'Finished Airing'
+		return response, True
 
 	async def get(self, id=None, anime=None):
 		if id is None:
