@@ -3,6 +3,9 @@ from datetime import datetime
 from tqdm import tqdm
 
 from .cache import staff_cache, character_cache
+from .log import logger
+
+log = logger.getChild(__name__)
 
 position_blacklist = []
 
@@ -38,7 +41,7 @@ async def get_staff(animes, score_min=0):
 					continue
 				add_people(voice_actor['person'], anime['mal_id'], [f"{character['character']['name']} VA"])
 
-	print(f"Found {len(peoples)} people")
+	log.info(f"Found {len(peoples)} people")
 
 	return peoples
 

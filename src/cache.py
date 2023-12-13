@@ -3,6 +3,10 @@ from datetime import datetime
 from jikanpy import AioJikan
 from pathlib import Path
 
+from src.log import logger
+
+log = logger.getChild(__name__)
+
 JIKAN_SLEEP_TIME = 1.1
 
 class Cache:
@@ -15,14 +19,14 @@ class Cache:
 		cache_file = self.cache_dir / f"{id}.json"
 
 		if cache_file.exists():
-			# print(f"Using cached data for {id}")
+			log.debug(f"Using cached data for {id}")
 			cached = json.load(cache_file.open())
 			if not self.is_expired(cached, *args, **kwargs):
 				return cached
 		
 		data, should_cache = await self.get_data(id, *args, **kwargs)
 		if should_cache:
-			# print(f"Caching data for {id}")
+			log.debug(f"Caching data for {id}")
 			cache_file.parent.mkdir(parents=True, exist_ok=True)
 			json.dump(data, cache_file.open('w'))
 
@@ -30,7 +34,7 @@ class Cache:
 
 async def rate_limit(coro, *args, **kwargs):
 	data = await coro(*args, **kwargs)
-	# print(f"Sleeping for {JIKAN_SLEEP_TIME} seconds")
+	log.debug(f"Sleeping for {JIKAN_SLEEP_TIME} seconds")
 	await asyncio.sleep(JIKAN_SLEEP_TIME) # Sleep to avoid rate limiting
 	return data
 
@@ -56,7 +60,7 @@ class AnimeCache(Cache):
 		return True
 
 	async def get_data(self, id=None, anime=None):
-		# print(f"Getting data for anime {id} with extension {self.extension}")
+		log.debug(f"Getting data for anime {id} with extension {self.extension}")
 		response = await rate_limit(self.jikan.anime, id, extension=self.extension)
 
 		if anime is None:

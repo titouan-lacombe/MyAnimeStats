@@ -1,9 +1,12 @@
-import gzip, json, datetime, pytz
+import datetime, pytz
 from typing import List, Dict
 import pandas as pd
 from collections import defaultdict
 from dateutil.tz import tzlocal
 from pathlib import Path
+from .log import logger
+
+log = logger.getChild(__name__)
 
 # Constants
 DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']

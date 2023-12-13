@@ -1,5 +1,9 @@
 import unidecode, re
 
+from .log import logger
+
+log = logger.getChild(__name__)
+
 def sanitize(text: str):
 	# Unidecode
 	text = unidecode.unidecode(text)
@@ -21,7 +25,7 @@ def get_franchise(a_title: str, f_title: str, auto: bool):
 
 	# If in manual mode, just check if the manual title is in the anime title, else return None
 	if not auto:
-		# print(f"Franchise match (manual): {f_title}")
+		log.debug(f"Franchise match (manual): {f_title}")
 		match = re.search(f_title, a_title)
 		return f_title if match else None
 
@@ -36,12 +40,12 @@ def get_franchise(a_title: str, f_title: str, auto: bool):
 	# If more than XX% of the characters of the shortest title are common, it is a franchise
 	min_len = min(len(a_title), len(f_title))
 	if len(franchise) / min_len > 0.8:
-		# print(f"Franchise match (XX%): {len(franchise)}/{min_len}")
+		log.debug(f"Franchise match (XX%): {len(franchise)}/{min_len}")
 		return franchise
 
 	# If the length of the common string is more than X characters, it is a franchise
 	if len(franchise) > 15:
-		# print(f"Franchise match (X characters)")
+		log.debug(f"Franchise match (X characters)")
 		return franchise
 
 	return None
@@ -112,7 +116,7 @@ def get_franchises(animes: list):
 
 	# for franchise in franchises:
 	# 	titles = [anime["title"] for anime in franchise["animes"]]
-	# 	print(f"- {franchise['title']} [{', '.join(titles)}]")
+	# 	log.debug(f"- {franchise['title']} [{', '.join(titles)}]")
 
 	# Compute the aggregated data for each franchise
 	franchises_aggr = []
@@ -140,6 +144,6 @@ def get_franchises(animes: list):
 
 		franchises_aggr.append(clean)
 		
-	print(f"Found {len(franchises_aggr)} franchises")
+	log.info(f"Found {len(franchises_aggr)} franchises")
 
 	return franchises_aggr
