@@ -47,12 +47,23 @@ def get_franchise(a_title: str, f_title: str, auto: bool):
 	return None
 
 # Return the weighted mean of the given attribute
-def weighted_mean(animes, attr, total_episodes):
-	if total_episodes > 0:  # Check to avoid division by zero
-		return sum((anime[attr] if anime[attr] is not None else 0) * 
-				   (anime["episodes"] if anime["episodes"] is not None else 0) 
-				   for anime in animes) / total_episodes
-	return None
+# If the attribute is None, it is ignored
+def weighted_mean(animes, attr, wh_attr):
+	total = 0
+	weight = 0
+	for anime in animes:
+		if anime[attr] is None:
+			continue
+		if anime[wh_attr] is None:
+			continue
+
+		total += anime[attr] * anime[wh_attr]
+		weight += anime[wh_attr]
+
+	if weight <= 0:
+		return None
+	
+	return total / weight
 
 # Return the union of the given attribute
 def union(animes, attr):
@@ -60,10 +71,6 @@ def union(animes, attr):
 
 # Return the list of franchises from the given list of animes
 def get_franchises(animes: list):
-	# Filter out the animes that aren't scored (to avoid messing up the weighted mean)
-	# TODO if score = 0, don't count it in the weighted mean
-	animes = [anime for anime in animes if anime['my_score'] != 0]
-
 	# List of known franchises (override the auto detection)
 	known_franchises = [
 		"Evangelion",
@@ -112,11 +119,18 @@ def get_franchises(animes: list):
 	for franchise in franchises:
 		animes = franchise['animes']
 
+		# Set score to None if not scored (score == 0)
+		for anime in animes:
+			if anime['score'] == 0:
+				anime['score'] = None
+			if anime['my_score'] == 0:
+				anime['my_score'] = None
+
 		clean = {}
 		clean['title'] = franchise['title']
 		clean['episodes'] = sum(anime["episodes"] if anime["episodes"] is not None else 0 for anime in animes)
-		clean['score'] = weighted_mean(animes, "score", clean['episodes'])
-		clean['my_score'] = weighted_mean(animes, "my_score", clean['episodes'])
+		clean['score'] = weighted_mean(animes, "score", 'episodes')
+		clean['my_score'] = weighted_mean(animes, "my_score", 'episodes')
 		clean['genres'] = union(animes, "genres")
 		clean['themes'] = union(animes, "themes")
 		clean['demographics'] = union(animes, "demographics")

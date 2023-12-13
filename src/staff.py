@@ -1,8 +1,9 @@
-import pprint
 from datetime import datetime
 from tqdm import tqdm
 
 from .cache import staff_cache, character_cache
+
+position_blacklist = []
 
 # Recover all people that worked on watched animes
 async def get_staff(animes, score_min=0):
@@ -26,8 +27,8 @@ async def get_staff(animes, score_min=0):
 		staff = await staff_cache.get(anime=anime)
  
 		for staff_member in staff:
-			# TODO position blacklist?
-			add_people(staff_member['person'], anime['mal_id'], staff_member['positions'])
+			positions = [position for position in staff_member['positions'] if position not in position_blacklist]
+			add_people(staff_member['person'], anime['mal_id'], positions)
 
 		characters = await character_cache.get(anime=anime)
 		for character in characters:
@@ -61,8 +62,8 @@ def print_staff(peoples, animes):
 		works.sort(key=lambda work: work["anime"]["aired"]["from"])
 
 		# TODO Don't show following works if same VA on same character?
-		# TODO add link to show work (f"https://www.youtube.com/results?search_query={people['name']}")
-		print(f"\n{people['name']} ({len(works)} works):")
+		showreel_url = f"https://www.youtube.com/results?search_query={people['name']}"
+		print(f"\n{people['name']} ({len(works)} works) - {showreel_url}")
 		for work in works:
 			date = datetime.strptime(work["anime"]["aired"]["from"], '%Y-%m-%dT%H:%M:%S%z')
 			anime = work["anime"]

@@ -47,6 +47,7 @@ class AnimeCache(Cache):
 		if anime is None:
 			anime = response["data"]
 
+		# TODO caching airing animes for 24h
 		return response, anime['status'] == 'Finished Airing'
 
 	async def get(self, id=None, anime=None):
