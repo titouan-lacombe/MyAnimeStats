@@ -6,8 +6,25 @@ from .log import logger
 
 log = logger.getChild(__name__)
 
+default_position_blacklist = [
+	"ADR Director", # Doesn't matter if watching in Japanese
+	"Producer",
+	"Executive Producer",
+	"Planning",
+]
+
+default_language_whitelist = [
+	"Japanese", # Japanese voice actors
+]
+
 # Recover all person that worked on watched animes
-async def get_staff(animes, score_min=0, position_blacklist=[]):
+async def get_staff(animes, score_min=8, position_blacklist=None, language_whitelist=None):
+	if position_blacklist is None:
+		position_blacklist = default_position_blacklist
+
+	if language_whitelist is None:
+		language_whitelist = default_language_whitelist
+
 	# Filter animes by status and score
 	def filter_anime(anime):
 		return anime["my_status"] != "Plan to Watch" and anime["my_score"] >= score_min
@@ -23,11 +40,14 @@ async def get_staff(animes, score_min=0, position_blacklist=[]):
 		person['characters'] = {}
 		return person
 
-	def add_positions(person, anime, positions):
+	def add_position(person, anime, position):
 		person = register_person(person)
+		if anime['mal_id'] in person['animes']:
+			person['animes'][anime['mal_id']]['positions'].append(position)
+			return
 		person['animes'][anime['mal_id']] = {
 			"anime": anime,
-			"positions": positions
+			"positions": [position]
 		}
 
 	def add_character(person, anime, character):
@@ -43,13 +63,15 @@ async def get_staff(animes, score_min=0, position_blacklist=[]):
 	for anime in tqdm(animes):
 		staff = await staff_cache.get(anime=anime)
 		for staff_member in staff:
-			positions = [position for position in staff_member['positions'] if position not in position_blacklist]
-			add_positions(staff_member['person'], anime, positions)
+			for position in staff_member['positions']:
+				if position in position_blacklist:
+					continue
+				add_position(staff_member['person'], anime, position)
 
 		characters = await character_cache.get(anime=anime)
 		for character in characters:
 			for voice_actor in character['voice_actors']:
-				if voice_actor['language'] != 'Japanese':
+				if voice_actor['language'] not in language_whitelist:
 					continue
 				add_character(voice_actor['person'], anime, character['character'])
 
