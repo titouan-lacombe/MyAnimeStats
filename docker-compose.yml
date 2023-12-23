@@ -2,27 +2,25 @@ version: '3'
 
 services:
   jikan:
-    image: jikan-rest
+    image: jikanme/jikan-rest
     restart: always
     environment:
-      - APP_URL=https://jikan.traefik.me
+      - APP_URL=https://localhost:8080
 
       - DB_CACHING=true
-      - DB_CONNECTION=mongodb
       - DB_HOST=db
-      - DB_PORT=27017
-      - DB_DATABASE=jikan
-      - DB_ADMIN=jikan
-      - DB_USERNAME=
-      - DB_PASSWORD=
+      - DB_DATABASE=$DB_DATABASE
+      - DB_USERNAME=$DB_USERNAME
+      - DB_PASSWORD=$DB_PASSWORD
 
       - CACHING=true
       - CACHE_DRIVER=redis
       - CACHE_METHOD=database
 
       - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=null
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+    ports:
+      - 8080:8080
 
   db:
     image: mongo
@@ -30,11 +28,9 @@ services:
     volumes:
       - ./data/db:/data/db
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=jikan
-      - MONGO_INITDB_ROOT_PASSWORD=jikan
-      - MONGO_INITDB_DATABASE=jikan
-      - MONGO_INITDB_USERNAME=
-      - MONGO_INITDB_PASSWORD=
+      - MONGO_INITDB_ROOT_USERNAME=$DB_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$DB_PASSWORD
+      - MONGO_INITDB_DATABASE=$DB_DATABASE
 
   redis:
     image: redis
@@ -42,4 +38,4 @@ services:
     volumes:
       - ./data/redis:/data
     environment:
-      - REDIS_PASSWORD=
+      - REDIS_PASSWORD=$REDIS_PASSWORD
