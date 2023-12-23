@@ -35,7 +35,5 @@ services:
   redis:
     image: redis
     restart: always
-    volumes:
-      - ./data/redis:/data
     environment:
       - REDIS_PASSWORD=$REDIS_PASSWORD
