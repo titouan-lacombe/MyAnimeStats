@@ -1,4 +1,4 @@
-COMPOSE=docker-compose -p myanimestats
+COMPOSE=docker compose -p myanimestats
 
 include .env
 export
