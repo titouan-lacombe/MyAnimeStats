@@ -4,20 +4,8 @@ services:
   jikan:
     image: jikanme/jikan-rest
     restart: always
-    environment:
-      - APP_URL=https://localhost:8080
-
-      - DB_CACHING=true
-      - DB_HOST=db
-      - DB_DATABASE=$DB_DATABASE
-      - DB_USERNAME=$DB_USERNAME
-      - DB_PASSWORD=$DB_PASSWORD
-
-      - CACHING=true
-      - CACHE_DRIVER=redis
-      - CACHE_METHOD=database
-
-      - REDIS_HOST=redis
+    volumes:
+      - ./jikan.env:/app/.env
     ports:
       - 8080:8080
 

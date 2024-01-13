@@ -7,7 +7,8 @@ from src.log import logger
 
 log = logger.getChild(__name__)
 
-JIKAN_SLEEP_TIME = 1.1
+JIKAN_SLEEP_TIME = 0
+# JIKAN_SLEEP_TIME = 1.1
 
 class Cache:
 	def __init__(self, cache_dir: Path, get_data, is_expired=lambda *args, **kwargs: False):
@@ -80,7 +81,8 @@ class AnimeCache(Cache):
 
 data = Path("data")
 cache_dir = data / ".cache"
-jikan_session = AioJikan()
+jikan_session = AioJikan("http://localhost:8080/v4")
+# jikan_session = AioJikan()
 
 anime_cache = AnimeCache(cache_dir, jikan_session)
 character_cache = AnimeCache(cache_dir, jikan_session, extension="characters")

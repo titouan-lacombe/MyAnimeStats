@@ -5,17 +5,20 @@ export
 
 default: up
 
-up:
-	$(COMPOSE) up -d
+build:
+	@envsubst < jikan.env.tpl > jikan.env
 
-recreate:
-	$(COMPOSE) up -d --force-recreate
+up: build
+	@$(COMPOSE) up -d
+
+recreate: build
+	@$(COMPOSE) up -d --force-recreate
 
 down:
-	$(COMPOSE) down --remove-orphans
+	@$(COMPOSE) down --remove-orphans
 
 logs:
-	$(COMPOSE) logs -f
+	@$(COMPOSE) logs -f
 
 attach:
-	$(COMPOSE) exec $(app) bash
+	@$(COMPOSE) exec $(app) bash
