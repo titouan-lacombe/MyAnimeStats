@@ -6,13 +6,16 @@ export
 default: up
 
 up:
-	${COMPOSE} up -d
+	$(COMPOSE) up -d
 
 recreate:
-	${COMPOSE} up -d --force-recreate
+	$(COMPOSE) up -d --force-recreate
 
 down:
-	${COMPOSE} down --remove-orphans
+	$(COMPOSE) down --remove-orphans
 
 logs:
-	${COMPOSE} logs -f
+	$(COMPOSE) logs -f
+
+attach:
+	$(COMPOSE) exec $(app) bash
