@@ -33,10 +33,10 @@ class Cache:
 
 		return data
 
-async def rate_limit(coro, *args, **kwargs):
+async def rate_limit(coro, sleep_time, *args, **kwargs):
 	data = await coro(*args, **kwargs)
-	log.debug(f"Sleeping for {JIKAN_SLEEP_TIME} seconds")
-	await asyncio.sleep(JIKAN_SLEEP_TIME) # Sleep to avoid rate limiting
+	log.debug(f"Sleeping for {sleep_time} seconds")
+	await asyncio.sleep(sleep_time) # Sleep to avoid rate limiting
 	return data
 
 class AnimeCache(Cache):
@@ -62,7 +62,7 @@ class AnimeCache(Cache):
 
 	async def get_data(self, id=None, anime=None):
 		log.debug(f"Getting data for anime {id} with extension {self.extension}")
-		response = await rate_limit(self.jikan.anime, id, extension=self.extension)
+		response = await rate_limit(self.jikan.anime, JIKAN_SLEEP_TIME, id, extension=self.extension)
 
 		if anime is None:
 			anime = response["data"]
