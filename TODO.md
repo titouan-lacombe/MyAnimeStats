@@ -1,4 +1,6 @@
 make the project more serious (myanimestats v2):
+	refactor backend to oop
+
 	build backend with flask? what does the backend do? how to prevent spamming the jikan API?
 		rate limit by ip x/min?
 
