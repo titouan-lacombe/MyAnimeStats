@@ -70,7 +70,7 @@ def clean_fields(data: dict, fields: dict):
             del data[field]
         elif isinstance(data[field], dict) and isinstance(fields[field], dict):
             clean_fields(data[field], fields[field])
-        elif fields[field] is not None and data[field] is not None:
+        elif fields[field] is not None and data[field] is not None and data[field] != "":
             data[field] = fields[field](data[field])
 
 def parse_field(data: dict, field: str, parser):
