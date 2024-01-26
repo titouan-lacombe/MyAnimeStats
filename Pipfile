@@ -15,6 +15,7 @@ pandas = "*"
 seaborn = "*"
 scikit-learn = "*"
 python-dotenv = "*"
+pyarrow = "*"
 
 [dev-packages]
 
