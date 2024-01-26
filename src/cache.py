@@ -80,7 +80,7 @@ class AnimeCache(Cache):
                     raise e
 
                 log.error(f"Retrying ({retries}/3)")
-                await asyncio.sleep(1)
+                await asyncio.sleep(5)
 
         if anime is None:
             anime = response["data"]
