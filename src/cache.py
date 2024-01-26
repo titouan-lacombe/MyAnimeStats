@@ -67,7 +67,20 @@ class AnimeCache(Cache):
 
     async def get_data(self, id=None, anime=None):
         log.debug(f"Getting data for anime {id} with extension {self.extension}")
-        response = await rate_limit(self.jikan.anime, JIKAN_SLEEP_TIME, id, extension=self.extension)
+
+        retries = 0
+        while True:
+            try:
+                response = await rate_limit(self.jikan.anime, JIKAN_SLEEP_TIME, id, extension=self.extension)
+                break
+            except Exception as e:
+                retries += 1
+                log.error(f"Error getting data for anime {id} with extension {self.extension}: {e}")
+                if retries > 3:
+                    raise e
+
+                log.error(f"Retrying ({retries}/3)")
+                await asyncio.sleep(1)
 
         if anime is None:
             anime = response["data"]
