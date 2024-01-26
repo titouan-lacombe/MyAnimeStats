@@ -44,6 +44,10 @@ def create_schedule(schedule: List[Dict]) -> pd.DataFrame:
     """Creates a DataFrame from the given schedule sorted by day of the week and time."""
     df_schedule = pd.DataFrame(schedule)
 
+    # If the DataFrame is empty, return an empty DataFrame
+    if df_schedule.empty:
+        return None
+
     # Sort the DataFrame by day of the week and time
     df_schedule = df_schedule.sort_values(['day', 'time'])
 
