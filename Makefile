@@ -22,3 +22,6 @@ logs:
 
 attach:
 	@$(COMPOSE) exec $(app) bash
+
+notebook:
+	@pipenv run jupyter notebook myanimestats.ipynb

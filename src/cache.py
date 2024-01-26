@@ -1,4 +1,4 @@
-import json, asyncio
+import json, asyncio, os
 from datetime import datetime
 from jikanpy import AioJikan
 from pathlib import Path
@@ -7,8 +7,13 @@ from src.log import logger
 
 log = logger.getChild(__name__)
 
-# JIKAN_URL, JIKAN_SLEEP_TIME = (None, 1.1)
-JIKAN_URL, JIKAN_SLEEP_TIME = ("http://localhost:8080/v4", 0)
+if os.getenv('SELF_HOST_JIKAN') != "true":
+    JIKAN_URL, JIKAN_SLEEP_TIME = (None, 1.1)
+else:
+    JIKAN_PORT = os.getenv('JIKAN_PORT')
+    if JIKAN_PORT is None:
+        raise ValueError("JIKAN_PORT must be set when SELF_HOST_JIKAN is true")
+    JIKAN_URL, JIKAN_SLEEP_TIME = (f"http://localhost:{JIKAN_PORT}/v4", 0)
 
 class Cache:
     def __init__(self, cache_dir: Path, get_data, is_expired=lambda *args, **kwargs: False):

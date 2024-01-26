@@ -14,6 +14,7 @@ tdqm = "*"
 pandas = "*"
 seaborn = "*"
 scikit-learn = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

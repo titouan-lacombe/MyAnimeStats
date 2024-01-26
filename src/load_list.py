@@ -13,7 +13,7 @@ async def scrape_animelist(user, aiohttp: aiohttp.ClientSession):
     results = []
     while True:
         # Get the data
-        log.info(f"Scraping web list with offset {start_offset}...")
+        log.info(f"Scraping user web list with offset {start_offset}...")
         async with aiohttp.get(f"{url}&offset={start_offset}") as response:
             entries = await response.json()
         results.extend(entries)
@@ -24,7 +24,7 @@ async def scrape_animelist(user, aiohttp: aiohttp.ClientSession):
 
         # Check if we're done
         if data_length == 0:
-            log.info(f"Scraped {start_offset} entries, done!")
+            log.info(f"Finished scraping user web list ({start_offset} total entries)")
             break
 
     return results
