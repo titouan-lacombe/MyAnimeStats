@@ -1,20 +1,22 @@
 # MyAnimeStats
 
-See statistics about lists from [MyAnimeList](https://myanimelist.net/).
+Explore and visualize insightful statistics derived from [MyAnimeList](https://myanimelist.net/) user lists.
 
-TODO logo and images
+<img src="./images/logo.png" width="256" height="256">
+
+TODO: images
 
 ## Setup
 
-### Clone the repository
+### Clone the Repository
 
 ```sh
 git clone https://github.com/titouanlacombe/myanimestats.git
 ```
 
-### Install the virtual python environment
+### Install the Virtual Python Environment
 
-using pipenv ([Install pipenv](https://github.com/pypa/pipenv?tab=readme-ov-file#installation)):
+Using pipenv ([install pipenv](https://github.com/pypa/pipenv?tab=readme-ov-file#installation)):
 
 ```sh
 pipenv install
@@ -22,39 +24,39 @@ pipenv install
 
 ### Configuration
 
-Before the next steps, copy the `.env.example` file to `.env`, you will use this file to configure the project.
+Before proceeding to the next steps, copy the `.env.example` file to `.env`. You will use this file to configure the project.
 
 ### Jikan API
 
-The project can use the [official Jikan API](https://jikan.moe/) or self-host it using docker.
+The project can use either the [official Jikan API](https://jikan.moe/) or be self-hosted using Docker.
 
-If you use the official Jikan API, you will be limited to 1 request per second (~1 anime per second).
+Using the official Jikan API, you will be limited to 1 request per second (~1 anime per second).
 
-If you self-host it, you need to have [docker](https://docs.docker.com/get-docker/) installed.
+To self-host it, you need to have [Docker](https://docs.docker.com/get-docker/) installed.
 
-#### Using the official Jikan API
+#### Using the Official Jikan API
 
-You don't need to do anything, the project will use the official Jikan API by default.
+You don't need to do anything; the project will use the official Jikan API by default.
 
 #### Self-hosting Jikan
 
-With docker installed, in `.env`, change `SELF_HOST_JIKAN` to `true`.
+With Docker installed, in `.env`, change `SELF_HOST_JIKAN` to `true`.
 
-Optionally you can change the `JIKAN_PORT` variable to the port you want to use.
+Optionally, you can change the `JIKAN_PORT` variable to the port you wish to use.
 
-Then, just run the following command to start the local Jikan API:
+Then, run the following command to start the local Jikan API:
 
 ```sh
 make up
 ```
 
-Jikan will be available at `http://localhost:{JIKAN_PORT}/v4`, the project will use this URL to make requests.
+Jikan will be available at `http://localhost:{JIKAN_PORT}/v4`. The project will use this URL to make requests.
 
-### Run the notebook
+### Run the Notebook
 
-Run the notebooks in the pipenv environment with the method of your choice (e.g. VSCode, Jupyter, ...).
+Run the notebooks in the pipenv environment using the method of your choice (e.g., VSCode, Jupyter).
 
-For example, you can run the web server notebook using the following command:
+For example, to run the web server notebook, use the following command:
 
 ```sh
 make notebook
@@ -62,18 +64,18 @@ make notebook
 
 ## Usage
 
-The notebook will ask you for your MyAnimeList username to scrap your list.
+The notebook will ask for your MyAnimeList username to scrape your list.
 
 You can save your username in `data/username.txt` to avoid having to enter it every time.
 
-If you want to scrape your list, make sure it is public, you can make your list public [here](https://myanimelist.net/editprofile.php?go=listpreferences)
+If you want to scrape your list, ensure it is public. You can make your list public [here](https://myanimelist.net/editprofile.php?go=listpreferences).
 
-Alternatively, if you want your list to stay private, you can export you MyAnimeList data from [here](https://myanimelist.net/panel.php?go=export) and save it to `data/animelist.xml.gz`.
+Alternatively, if you wish to keep your list private, you can export your MyAnimeList data from [here](https://myanimelist.net/panel.php?go=export) and save it to `data/animelist.xml.gz`.
 
-Now you can run all the cells in the notebook and see the results.
+Now, you can run all the cells in the notebook and view the results.
 
 ## Results
 
-For example, here are the stats of popular YouTuber [Gigguk](https://www.youtube.com/user/gigguk) (MAL username `gigguk`):
+For example, here are the stats of popular YouTuber [Gigguk](https://www.youtube.com/user/gigguk) (MAL username: `gigguk`):
 
 TODO
