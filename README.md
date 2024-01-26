@@ -1,6 +1,5 @@
 <div align="center">
-<!-- Border radius 10px -->
-  <img alt="ollama" height="256px" src="./images/logo.png" style="border-radius: 40px">
+  <img alt="logo" height="256px" src="./images/logo.png">
 </div>
 
 # MyAnimeStats
