@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  jikan:
+    image: jikanme/jikan-rest
+    restart: always
+    volumes:
+      - ./jikan.env:/app/.env
+    ports:
+      - 8080:8080
+
+  db:
+    image: mongo
+    restart: always
+    volumes:
+      - ./data/db:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$DB_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$DB_PASSWORD
+      - MONGO_INITDB_DATABASE=$DB_DATABASE
+
+  redis:
+    image: redis
+    restart: always
