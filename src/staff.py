@@ -87,7 +87,7 @@ async def get_staff(animes, score_min=8, position_blacklist=None, language_white
         for character in person['characters']:
             character['animes'].sort(key=lambda anime: anime['aired']['from'])
         person['characters'].sort(key=lambda character: character['animes'][0]['aired']['from'])
-        
+
         person['works'] = len(person['animes']) + len(person['characters'])
 
     log.info(f"Found {len(persons)} persons")
@@ -119,4 +119,3 @@ def print_staff(persons, show_top=10, min_works=2):
             animes = work["animes"]
             animes_title = ', '.join([anime['title_english'] if anime['title_english'] is not None else anime['title'] for anime in animes])
             print(f"[{animes[0]['aired']['from'].year}] {character['name']} ({animes_title})")
-    

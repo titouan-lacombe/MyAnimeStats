@@ -23,11 +23,11 @@ async def my_anime_stats(export_file=None, username=None):
             animes = await load_web_list(username, session)
     else:
         raise ValueError("Either export_file or username must be specified")
-    
+
     # Complete anime data
     log.info("Completing animes data with data from MAL")
     animes = await complete_animes(animes)
-    
+
     # Get staff
     log.info("Getting staff data from MAL")
     staff = await get_staff(animes)

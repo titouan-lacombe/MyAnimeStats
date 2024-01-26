@@ -66,7 +66,7 @@ def weighted_mean(animes, attr, wh_attr):
 
     if weight <= 0:
         return None
-    
+
     return total / weight
 
 # Return the union of the given attribute
@@ -99,13 +99,13 @@ def get_franchises(animes: list):
         for i in range(len(franchises)):
             franchise = franchises[i]
             match = get_franchise(anime["title"], franchise["title"], franchise["auto"])
-            
+
             # Found franchise: add anime to it
             if match:
                 franchises[i]["animes"].append(anime)
                 franchises[i]["title"] = match
                 break
-        
+
         # Franchise not found: new franchise
         if not match:
             franchises.append({
@@ -143,7 +143,7 @@ def get_franchises(animes: list):
         clean['producers'] = union(animes, "producers")
 
         franchises_aggr.append(clean)
-        
+
     log.info(f"Found {len(franchises_aggr)} franchises")
 
     return franchises_aggr

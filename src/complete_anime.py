@@ -78,7 +78,7 @@ def parse_field(data: dict, field: str, parser):
 
     while len(fields) > 1:
         data = data[fields.pop(0)]
-    
+
     field = fields.pop(0)
     if data[field] is None:
         return

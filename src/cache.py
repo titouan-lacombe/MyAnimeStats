@@ -24,7 +24,7 @@ class Cache:
             cached = json.load(cache_file.open())
             if not self.is_expired(cached, *args, **kwargs):
                 return cached
-        
+
         data, should_cache = await self.get_data(id, *args, **kwargs)
         if should_cache:
             log.debug(f"Caching data for {id}")
