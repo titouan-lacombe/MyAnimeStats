@@ -1,8 +1,11 @@
+<div align="center">
+<!-- Border radius 10px -->
+  <img alt="ollama" height="256px" src="./images/logo.png" style="border-radius: 40px">
+</div>
+
 # MyAnimeStats
 
 Explore and visualize insightful statistics derived from [MyAnimeList](https://myanimelist.net/) user lists.
-
-<img src="./images/logo.png" width="256" height="256">
 
 TODO: images
 
