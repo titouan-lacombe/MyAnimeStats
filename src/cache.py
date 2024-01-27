@@ -8,12 +8,46 @@ from src.log import logger
 log = logger.getChild(__name__)
 
 if os.getenv('SELF_HOST_JIKAN') != "true":
-    JIKAN_URL, JIKAN_SLEEP_TIME = (None, 1.1)
+    JIKAN_URL, JIKAN_QPS = (None, 0.9)
 else:
     JIKAN_PORT = os.getenv('JIKAN_PORT')
     if JIKAN_PORT is None:
         raise ValueError("JIKAN_PORT must be set when SELF_HOST_JIKAN is true")
-    JIKAN_URL, JIKAN_SLEEP_TIME = (f"http://localhost:{JIKAN_PORT}/v4", 0)
+    JIKAN_URL, JIKAN_QPS = (f"http://localhost:{JIKAN_PORT}/v4", 2)
+
+# From https://stackoverflow.com/questions/38683243/asyncio-rate-limiting
+from collections import deque
+class RateLimitingSemaphore:
+    def __init__(self, qps_limit, loop=None):
+        self.loop = loop or asyncio.get_event_loop()
+        self.qps_limit = qps_limit
+
+        # The number of calls that are queued up, waiting for their turn.
+        self.queued_calls = 0
+
+        # The times of the last N executions, where N=qps_limit - this should allow us to calculate the QPS within the
+        # last ~ second. Note that this also allows us to schedule the first N executions immediately.
+        self.call_times = deque()
+
+    async def __aenter__(self):
+        self.queued_calls += 1
+        while True:
+            cur_rate = 0
+            if len(self.call_times) >= self.qps_limit:
+                cur_rate = len(self.call_times) / (self.loop.time() - self.call_times[0])
+            if cur_rate < self.qps_limit:
+                break
+            interval = 1. / self.qps_limit
+            elapsed_time = self.loop.time() - self.call_times[-1]
+            await asyncio.sleep(self.queued_calls * interval - elapsed_time)
+        self.queued_calls -= 1
+
+        if len(self.call_times) >= self.qps_limit:
+            self.call_times.popleft()
+        self.call_times.append(self.loop.time())
+
+    async def __aexit__(self, exc_type, exc, tb):
+        pass
 
 class Cache:
     def __init__(self, cache_dir: Path, get_data, is_expired=lambda *args, **kwargs: False):
@@ -38,16 +72,11 @@ class Cache:
 
         return data
 
-async def rate_limit(coro, sleep_time, *args, **kwargs):
-    data = await coro(*args, **kwargs)
-    log.debug(f"Sleeping for {sleep_time} seconds")
-    await asyncio.sleep(sleep_time) # Sleep to avoid rate limiting
-    return data
-
 class AnimeCache(Cache):
     def __init__(self, cache_dir: Path, jikan: AioJikan, extension=None):
         self.jikan = jikan
         self.extension = extension
+        self.rate_limiter = RateLimitingSemaphore(JIKAN_QPS)
         subdir = "anime" if self.extension is None else f"anime_{self.extension}"
         super().__init__(cache_dir / subdir, self.get_data, self.is_expired)
 
@@ -71,7 +100,8 @@ class AnimeCache(Cache):
         retries = 0
         while True:
             try:
-                response = await rate_limit(self.jikan.anime, JIKAN_SLEEP_TIME, id, extension=self.extension)
+                async with self.rate_limiter:
+                    response = await self.jikan.anime(id, extension=self.extension)
                 break
             except Exception as e:
                 retries += 1
