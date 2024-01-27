@@ -6,7 +6,7 @@
 
 Explore insightful statistics about a [MyAnimeList](https://myanimelist.net/) user list.
 
-<img alt="gigguk_opinion" height="512px" src="./images/gigguk_opinion.png">
+<img alt="gigguk_opinion" src="./images/gigguk_opinion.png">
 
 ## Setup
 
@@ -80,10 +80,10 @@ Now, you can run all the cells in the notebook and view the results.
 
 For example, here are the stats of popular YouTuber [Gigguk](https://www.youtube.com/user/gigguk) (MAL username: `gigguk`):
 
-<img alt="gigguk_score" height="512px" src="./images/gigguk_score.png">
-<img alt="gigguk_year_score" height="512px" src="./images/gigguk_year_score.png">
-<img alt="gigguk_genres" height="512px" src="./images/gigguk_genres.png">
-<img alt="gigguk_studios" height="512px" src="./images/gigguk_studios.png">
+<img alt="gigguk_score" src="./images/gigguk_score.png">
+<img alt="gigguk_year_score" src="./images/gigguk_year_score.png">
+<img alt="gigguk_genres" src="./images/gigguk_genres.png">
+<img alt="gigguk_studios" src="./images/gigguk_studios.png">
 <img alt="gigguk_normie" src="./images/gigguk_normie.png">
 <img alt="gigguk_unpopular" src="./images/gigguk_unpopular.png">
-<img alt="gigguk_opinion" height="512px" src="./images/gigguk_opinion.png">
+<img alt="gigguk_opinion" src="./images/gigguk_opinion.png">
