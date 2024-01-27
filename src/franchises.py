@@ -135,6 +135,9 @@ def get_franchises(animes: list):
     for franchise in franchises:
         animes = franchise['animes']
 
+        if len(animes) == 0:
+            continue
+
         # Set score to None if not scored (score == 0)
         for anime in animes:
             if anime['score'] == 0:
