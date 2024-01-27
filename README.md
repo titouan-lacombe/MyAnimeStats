@@ -13,7 +13,7 @@ Explore insightful statistics about a [MyAnimeList](https://myanimelist.net/) us
 ### Clone the Repository
 
 ```sh
-git clone https://github.com/titouanlacombe/myanimestats.git
+git clone https://github.com/titouanlacombe/MyAnimeStats.git
 ```
 
 ### Install the Virtual Python Environment
