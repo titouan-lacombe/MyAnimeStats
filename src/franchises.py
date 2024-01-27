@@ -50,6 +50,18 @@ def get_franchise(a_title: str, f_title: str, auto: bool):
 
     return None
 
+# Return the name of the franchise, none if not found
+def get_franchise_list(titles: list, auto: bool):
+    if len(titles) == 0:
+        return None
+
+    franchise = titles[0]
+    for title in titles[1:]:
+        franchise = get_franchise(title, franchise, auto)
+        if franchise is None:
+            break
+    return franchise
+    
 # Return the weighted mean of the given attribute
 # If the attribute is None, it is ignored
 def weighted_mean(animes, attr, wh_attr):
@@ -132,6 +144,12 @@ def get_franchises(animes: list):
 
         clean = {}
         clean['title'] = franchise['title']
+        clean['title_english'] = get_franchise_list([
+            anime["title_english"] for anime in animes if anime["title_english"]],
+            True,
+        ) or animes[0]["title_english"]
+        if clean['title_english'] is None:
+            clean['title_english'] = clean['title']
         clean['episodes'] = sum(anime["episodes"] if anime["episodes"] is not None else 0 for anime in animes)
         clean['score'] = weighted_mean(animes, "score", 'episodes')
         clean['my_score'] = weighted_mean(animes, "my_score", 'episodes')
