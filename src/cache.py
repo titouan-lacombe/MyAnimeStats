@@ -8,11 +8,13 @@ from src.log import logger
 log = logger.getChild(__name__)
 
 if os.getenv('SELF_HOST_JIKAN') != "true":
+    log.info("Using public Jikan API")
     JIKAN_URL, JIKAN_QPS = (None, 0.9)
 else:
     JIKAN_PORT = os.getenv('JIKAN_PORT')
     if JIKAN_PORT is None:
         raise ValueError("JIKAN_PORT must be set when SELF_HOST_JIKAN is true")
+    log.info(f"Using self-hosted Jikan API on port {JIKAN_PORT}")
     JIKAN_URL, JIKAN_QPS = (f"http://localhost:{JIKAN_PORT}/v4", 2)
 
 # From https://stackoverflow.com/questions/38683243/asyncio-rate-limiting
