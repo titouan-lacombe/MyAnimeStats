@@ -92,8 +92,38 @@ async def get_staff(animes, score_min=8, position_blacklist=None, language_white
 
     log.info(f"Found {len(persons)} persons")
 
-    # Sort person by number of works
-    persons.sort(key=lambda person: person['works'], reverse=True)
+    # Calculate person score
+    for person in persons:
+        person['score'] = 0
+
+		# TODO use franchise instead of anime
+        character_animes = set([
+            anime['mal_id'] for character in person['characters'] for anime in character['animes']
+        ])
+        animes = set([anime['anime']['mal_id'] for anime in person['animes']])
+        animes.update(character_animes)
+
+        def score_anime(anime):
+            if anime['mal_id'] not in animes:
+                # Ignore anime if already counted as character
+                return
+            animes.remove(anime['mal_id'])
+
+            # score = anim score ^ n / max score ^ n
+            # n controls the importance of high scores
+            n = 8
+            person['score'] += anime['my_score'] ** n / 10 ** n
+
+        # Score staff
+        for anime in person['animes']:
+            score_anime(anime['anime'])
+
+        for character in person['characters']:
+            for anime in character['animes']:
+                score_anime(anime)
+
+    # Sort person by score
+    persons.sort(key=lambda person: person['score'], reverse=True)
 
     return persons
 
@@ -103,7 +133,7 @@ def print_staff(persons, show_top=10, min_works=2):
 
     for person in persons[:show_top]:
         showreel_url = f"https://www.youtube.com/results?search_query={quote(person['name'])}"
-        print(f"\n{person['name']} ({person['works']} works) - {showreel_url}")
+        print(f"\n{person['name']} ({person['works']} works, score: {person['score']:.2f}) - {showreel_url}")
 
         if len(person['animes']) > 0:
             print("Anime staff:")

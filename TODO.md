@@ -1,4 +1,6 @@
 refactor backend to oop
+ - move schedule & staff away from import
+ - 
 
 build backend with flask? what does the backend do? how to prevent spamming the jikan API?
 	rate limit by ip x/min?
