@@ -2,8 +2,6 @@ import aiohttp
 
 from .load_list import load_web_list, load_xml_list
 from .complete_anime import complete_animes
-from .franchises import get_franchises
-from .schedule import get_schedule
 from .staff import get_staff
 from .log import logger
 
@@ -12,7 +10,7 @@ log = logger.getChild(__name__)
 # Get franchises from input
 # export_file: File like object containing the MAL XML export
 # username: string containing the MAL username
-async def my_anime_stats(export_file=None, username=None):
+async def import_data(export_file=None, username=None):
     # Load anime list
     if export_file is not None:
         log.info("Loading anime list from MAL XML export")
@@ -32,12 +30,4 @@ async def my_anime_stats(export_file=None, username=None):
     log.info("Getting staff details with Jikan API")
     staff = await get_staff(animes)
 
-    # Compute franchises
-    log.info("Computing franchises")
-    franchises = get_franchises(animes)
-
-    # Get schedule
-    log.info("Computing schedule")
-    schedule = get_schedule(animes)
-
-    return animes, franchises, schedule, staff
+    return animes, staff

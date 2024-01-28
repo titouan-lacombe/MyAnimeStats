@@ -75,8 +75,10 @@ async def get_staff(animes, score_min=8, position_blacklist=None, language_white
                     continue
                 add_character(voice_actor['person'], anime, character['character'])
 
-    # Convert dict to list and sort
-    persons = list(persons.values())
+    # Convert dict to list
+    return list(persons.values())
+
+def sort_staff(persons: list):
     for person in persons:
         # Sort anime by airing date (to reflect artist evolution)
         person['animes'] = list(person['animes'].values())
@@ -96,7 +98,7 @@ async def get_staff(animes, score_min=8, position_blacklist=None, language_white
     for person in persons:
         person['score'] = 0
 
-		# TODO use franchise instead of anime
+        # TODO use franchise instead of anime
         character_animes = set([
             anime['mal_id'] for character in person['characters'] for anime in character['animes']
         ])
@@ -125,27 +127,28 @@ async def get_staff(animes, score_min=8, position_blacklist=None, language_white
     # Sort person by score
     persons.sort(key=lambda person: person['score'], reverse=True)
 
-    return persons
+def reoccurring_staff(persons, show_top=10) -> str:
+    sort_staff(persons)
 
-def print_staff(persons, show_top=10, min_works=2):
-    # Only display person with more than X works
-    persons = [person for person in persons if len(person['animes']) + len(person['characters']) >= min_works]
+    html = ""
 
     for person in persons[:show_top]:
         showreel_url = f"https://www.youtube.com/results?search_query={quote(person['name'])}"
-        print(f"\n{person['name']} ({person['works']} works, score: {person['score']:.2f}) - {showreel_url}")
+        html += f"<h2><a href='{showreel_url}'>{person['name']}</a> ({person['works']} works, score: {person['score']:.2f})</h2>"
 
         if len(person['animes']) > 0:
-            print("Anime staff:")
+            html += "<h3>Anime staff:</h3>"
         for work in person['animes']:
             anime = work["anime"]
             anime_title = anime['title_english'] or anime['title']
-            print(f"[{anime['aired']['from'].year}] {', '.join(work['positions'])} ({anime_title})")
+            html += f"<b>{anime['aired']['from'].year}</b>: {', '.join(work['positions'])} ({anime_title})<br>"
 
         if len(person['characters']) > 0:
-            print("Character voice actor:")
+            html += "<h3>Character voice actor:</h3>"
         for work in person['characters']:
             character = work["character"]
             animes = work["animes"]
             animes_title = ', '.join([anime['title_english'] if anime['title_english'] is not None else anime['title'] for anime in animes])
-            print(f"[{animes[0]['aired']['from'].year}] {character['name']} ({animes_title})")
+            html += f"<b>{animes[0]['aired']['from'].year}</b>: {character['name']} ({animes_title})<br>"
+
+    return html
