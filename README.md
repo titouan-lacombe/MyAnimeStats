@@ -6,7 +6,8 @@
 
 Explore insightful statistics about a [MyAnimeList](https://myanimelist.net/) user list.
 
-<img alt="gigguk_opinion" src="./images/gigguk_opinion.png">
+<!-- Half size -->
+<img alt="gigguk_opinion" src="./images/gigguk_opinion.png" height="50%" width="50%">
 
 ## Setup
 
@@ -87,4 +88,4 @@ For example, here are the stats of popular YouTuber [Gigguk](https://www.youtube
 <img alt="gigguk_studios" src="./images/gigguk_studios.png">
 <img alt="gigguk_normie" src="./images/gigguk_normie.png">
 <img alt="gigguk_unpopular" src="./images/gigguk_unpopular.png">
-<img alt="gigguk_opinion" src="./images/gigguk_opinion.png">
+<img alt="gigguk_opinion" src="./images/gigguk_opinion.png" height="50%" width="50%">
