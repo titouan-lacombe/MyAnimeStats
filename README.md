@@ -19,10 +19,10 @@ git clone https://github.com/titouanlacombe/MyAnimeStats.git
 
 ### Install the Virtual Python Environment
 
-Using pipenv ([install pipenv](https://github.com/pypa/pipenv?tab=readme-ov-file#installation)):
+Using pdm ([install pdm](https://github.com/pdm-project/pdm#installation)):
 
 ```sh
-pipenv install
+pdm install
 ```
 
 ### Configuration
