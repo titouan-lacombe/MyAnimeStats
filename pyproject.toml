@@ -1,0 +1,34 @@
+[project]
+name = "myanimestats"
+version = "1.1.0"
+description = "Explore insightful statistics about a MyAnimeList user list"
+authors = [{ name = "Titouan Lacombe", email = "titouan.lacombe99@gmail.com" }]
+dependencies = [
+	"jupyter",
+	"jikanpy-v4",
+	"xmltodict",
+	"dicttoxml2",
+	"matplotlib",
+	"unidecode",
+	"tdqm",
+	"pandas",
+	"seaborn",
+	"scikit-learn",
+	"python-dotenv",
+	"pyarrow",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+
+
+[tool.pdm]
+distribution = false
+
+[[tool.pdm.source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[tool.pdm.dev-dependencies]
+dev = []

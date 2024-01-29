@@ -24,4 +24,4 @@ attach:
 	@$(COMPOSE) exec $(app) bash
 
 notebook:
-	@pipenv run jupyter notebook myanimestats.ipynb
+	@pdm run jupyter notebook myanimestats.ipynb
