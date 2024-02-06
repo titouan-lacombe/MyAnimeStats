@@ -25,8 +25,8 @@ def get_franchise(a_title: str, f_title: str, auto: bool):
 
     # If in manual mode, just check if the manual title is in the anime title, else return None
     if not auto:
-        log.debug(f"Franchise match (manual): {f_title}")
         match = re.search(f_title, a_title)
+        log.debug(f"Franchise match (manual): {match is not None}")
         return f_title if match else None
 
     common = []
@@ -40,12 +40,12 @@ def get_franchise(a_title: str, f_title: str, auto: bool):
     # If more than XX% of the characters of the shortest title are common, it is a franchise
     min_len = min(len(a_title), len(f_title))
     if len(franchise) / min_len > 0.8:
-        log.debug(f"Franchise match (XX%): {len(franchise)}/{min_len}")
+        log.debug(f"Franchise match (percent): {len(franchise)}/{min_len}")
         return franchise
 
     # If the length of the common string is more than X characters, it is a franchise
     if len(franchise) > 15:
-        log.debug(f"Franchise match (X characters)")
+        log.debug(f"Franchise match (length): {len(franchise)}")
         return franchise
 
     return None
@@ -93,6 +93,7 @@ def get_franchises(animes: list):
         "Code Geass",
         "Mushoku Tensei",
         "Fullmetal Alchemist: Brotherhood", # Separate from FMA 2003
+        "Vinland Saga",
     ]
 
     # Initialize franchises list with known franchises
@@ -114,6 +115,7 @@ def get_franchises(animes: list):
 
             # Found franchise: add anime to it
             if match:
+                log.debug(f"Matched anime '{anime['title']}' to franchise '{match}'")
                 franchises[i]["animes"].append(anime)
                 franchises[i]["title"] = match
                 break

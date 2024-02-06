@@ -1,7 +1,7 @@
 import logging
 
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 stdout_handler = logging.StreamHandler()
 stdout_handler.setLevel(logging.INFO)
