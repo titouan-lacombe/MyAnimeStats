@@ -19,9 +19,9 @@ def sanitize(text: str):
 
 # Return the name of the franchise, none if not found
 def get_franchise(a_title: str, f_title: str, auto: bool):
-    words1 = a_title.split(" ")
-    words2 = f_title.split(" ")
-    min_w_len = min(len(words1), len(words2))
+    words_a = a_title.split(" ")
+    words_f = f_title.split(" ")
+    min_w_len = min(len(words_a), len(words_f))
 
     # If in manual mode, just check if the manual title is in the anime title, else return None
     if not auto:
@@ -31,8 +31,8 @@ def get_franchise(a_title: str, f_title: str, auto: bool):
 
     common = []
     for i in range(min_w_len):
-        if sanitize(words1[i]) == sanitize(words2[i]):
-            common.append(words1[i])
+        if sanitize(words_a[i]) == sanitize(words_f[i]):
+            common.append(words_f[i])
         else:
             break
     franchise = " ".join(common)
@@ -55,11 +55,17 @@ def get_franchise_list(titles: list, auto: bool):
     if len(titles) == 0:
         return None
 
+    log.debug(f"Franchise match: {', '.join(titles)}")
+
     franchise = titles[0]
     for title in titles[1:]:
         franchise = get_franchise(title, franchise, auto)
+
         if franchise is None:
-            break
+            log.debug(f"Franchise match failed")
+            return None
+
+    log.debug(f"Franchise match success: '{franchise}'")
     return franchise
     
 # Return the weighted mean of the given attribute
@@ -150,9 +156,9 @@ def get_franchises(animes: list):
         clean = {}
         clean['title'] = franchise['title']
         clean['title_english'] = get_franchise_list([
-            anime["title_english"] for anime in animes if anime["title_english"]],
+            anime["title_english"] or anime["title"] for anime in animes],
             True,
-        ) or animes[0]["title_english"]
+        )
         if clean['title_english'] is None:
             clean['title_english'] = clean['title']
         clean['episodes'] = sum(anime["episodes"] if anime["episodes"] is not None else 0 for anime in animes)
