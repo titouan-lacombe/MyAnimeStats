@@ -1,16 +1,20 @@
-refactor backend to oop
- - pydantic models? maybe after data model is designed
+Scrape instead of using API:
+https://github.com/andreu-vall/myanimelist-api-scraping/tree/master
+- scrape, clean, save parquet (or other), in chunks
+- merge dataset
 
-build database with https://github.com/manami-project/anime-offline-database
- - design data model
- - implement in django postgresql (use async)
- - auto updater service for database
+refactor codebase:
+- use rich for logging
+- use oop
+- use polars
 
-build backend? what does the backend do? how to prevent spamming the jikan API?
-	rate limit by ip x/min?
+convert data manip to JS? or intermediate data format sent to frontend?
+make graphs & frontend with d3.js? or other?
 
-convert data manip to JS and make graphs & frontend with d3.js?
+build backend api with a real db?
+
+deploy to server (build & test locally)
 
 stats i could add:
- - episode watched (total time)
- - franchise watched / franchise to watch
+ - episodes watched (total time)
+ - franchises watched / franchises to watch (will need relational data if we want better stats)
