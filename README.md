@@ -22,7 +22,7 @@ git clone https://github.com/titouanlacombe/MyAnimeStats.git
 Using pdm ([install pdm](https://github.com/pdm-project/pdm#installation)):
 
 ```sh
-pdm install
+pdm sync
 ```
 
 ### Configuration
