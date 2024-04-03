@@ -1,7 +1,4 @@
-Scrape instead of using API:
-https://github.com/andreu-vall/myanimelist-api-scraping/tree/master
-- scrape, clean, save parquet (or other), in chunks
-- merge dataset
+use scrapped database as new backend
 
 refactor codebase:
 - use rich for logging

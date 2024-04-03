@@ -1,17 +1,14 @@
 COMPOSE=docker compose -p myanimestats
 
-include .env
-export
-
 default: up
 
-build:
-	@envsubst < jikan.env.tpl > jikan.env
+mkdata:
+	@mkdir -p data
 
-up: build
+up: mkdata
 	@$(COMPOSE) up -d
 
-recreate: build
+recreate: mkdata
 	@$(COMPOSE) up -d --force-recreate
 
 down:
