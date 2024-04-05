@@ -92,6 +92,7 @@ def union(animes, attr):
     return list(set(name['name'] for anime in animes for name in anime[attr]))
 
 # Return the list of franchises from the given list of animes
+# TODO add column franchise + group by
 def get_franchises(animes: list):
     # List of known franchises (override the auto detection)
     known_franchises = [
