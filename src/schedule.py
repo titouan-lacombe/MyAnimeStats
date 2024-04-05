@@ -3,14 +3,12 @@ from typing import List, Dict
 import pandas as pd
 from collections import defaultdict
 from dateutil.tz import tzlocal
-from pathlib import Path
 from .log import logger
 
 log = logger.getChild(__name__)
 
 # Constants
-DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-data = Path('data')
+WEEK_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 jst_tz = pytz.timezone('Asia/Tokyo')
 
 def get_watching_animes(animes: List[Dict]) -> List[Dict]:
@@ -25,13 +23,14 @@ def convert_to_local_time(day_str: str, time_str: str) -> datetime.datetime:
     start_of_week = now.date() - datetime.timedelta(days=now.weekday())
 
     # Get the day and time of the anime broadcast
-    day_num = DAYS_OF_WEEK.index(day_str.rstrip('s'))  # Remove 's' from the end of the day to make it singular
+    day_num = WEEK_DAYS.index(day_str.rstrip('s'))  # Remove 's' from the end of the day to make it singular
     time = datetime.time.fromisoformat(time_str)
 
     # Create a full datetime for the anime broadcast
     broadcast = datetime.datetime.combine(start_of_week + datetime.timedelta(days=day_num), time)
 
     # Localize the datetime to the JST timezone
+    # TODO localize to the anime's timezone
     broadcast = jst_tz.localize(broadcast)
 
     # Normalize the datetime to handle daylight saving time transitions
@@ -60,16 +59,16 @@ def create_schedule(schedule: List[Dict]) -> pd.DataFrame:
     max_len = max(len(v) for v in schedule_by_day.values())
 
     # Extend the lists of other days with empty strings until they match the maximum length
-    for day in DAYS_OF_WEEK:
+    for day in WEEK_DAYS:
         schedule_by_day[day].extend([''] * (max_len - len(schedule_by_day[day])))
 
     # Create a DataFrame for the schedule
     df_schedule_by_day = pd.DataFrame(dict(schedule_by_day))
-    df_schedule_by_day = df_schedule_by_day.reindex(DAYS_OF_WEEK, axis=1)  # Reorder the columns by day of the week
+    df_schedule_by_day = df_schedule_by_day.reindex(WEEK_DAYS, axis=1)  # Reorder the columns by day of the week
 
     return df_schedule_by_day
 
-
+# TODO return html table
 def get_schedule(animes):
     # Extract airing schedule for the animes being watched
     schedule = []
@@ -81,7 +80,7 @@ def get_schedule(animes):
 
             schedule.append({
                 'title': title,
-                'day': DAYS_OF_WEEK[broadcast_local.weekday()],
+                'day': WEEK_DAYS[broadcast_local.weekday()],
                 'time': broadcast_local.time()
             })
 
