@@ -55,6 +55,11 @@ def clean_user_list(user_list: pl.LazyFrame) -> pl.LazyFrame:
 		for col in ["user_storage", "user_priority", "user_notes", "user_editable_notes", "user_tags"]
 	])
 
+	# Score 0 means no score
+	user_list = user_list.with_columns(
+		user_scored = pl.col("user_scored").replace(0, None),
+	)
+
 	# Convert status & priority to enums
 	user_list = user_list.with_columns(
 		user_watch_status = pl.col("user_watch_status").replace(STATUS_MAP).cast(pl.Enum(STATUS_MAP.values())),
