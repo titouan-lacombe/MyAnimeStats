@@ -5,7 +5,16 @@ import polars as pl
 WEEK_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 class Schedule:
-	# Build the schedule with the user timezone
+	def get(user_animes: pl.LazyFrame):
+		return user_animes.filter(
+			(pl.col("user_watch_status") == "Watching") & (pl.col("air_status") == "Currently Airing")
+		).select(
+			"title",
+			"air_day",
+			"air_time",
+			"air_tz",
+		)
+
 	def __init__(self, schedule: dict[str, list[dict[str, any]]]):
 		self.schedule = schedule
 
@@ -32,19 +41,10 @@ class Schedule:
 		# Convert the datetime to the local timezone
 		return air_at.astimezone(to_tz)
 
-	# Build the schedule with the user timezone
-	def from_user_animes(user_animes: pl.LazyFrame):
+	# Finish building the schedule with the user timezone
+	def from_df(schedule_df: pl.DataFrame):
 		default_tz = "Asia/Tokyo"
 		fake_user_tz = "Europe/Paris"
-
-		# Filter the animes that are currently airing and the user is watching
-		schedule_df = user_animes.filter((pl.col("user_watch_status") == "Watching") & (pl.col("air_status") == "Currently Airing")).select(
-			"title",
-			"air_day",
-			"air_time",
-			"air_tz",
-		).collect()
-		# print_df(schedule, "Schedule")
 
 		# Build the schedule from the filtered animes
 		schedule = {day: [] for day in WEEK_DAYS}
