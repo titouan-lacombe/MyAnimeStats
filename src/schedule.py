@@ -1,90 +1,84 @@
-import datetime, pytz
-from typing import List, Dict
-import pandas as pd
-from collections import defaultdict
-from dateutil.tz import tzlocal
-from .log import logger
+import pytz
+from datetime import datetime, time, timedelta
+import polars as pl
 
-log = logger.getChild(__name__)
-
-# Constants
 WEEK_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-jst_tz = pytz.timezone('Asia/Tokyo')
 
-def get_watching_animes(animes: List[Dict]) -> List[Dict]:
-    """Returns the animes that are currently airing and being watched by the user."""
-    return [anime for anime in animes if anime['airing'] and anime['my_status'] == 'Watching']
+class Schedule:
+	# Build the schedule with the user timezone
+	def __init__(self, schedule: dict[str, list[dict[str, any]]]):
+		self.schedule = schedule
 
-def convert_to_local_time(day_str: str, time_str: str) -> datetime.datetime:
-    """Converts the given day and time in UTC to local time."""
-    now = datetime.datetime.now(tzlocal())
+	def get_dt(week_day: str, time: time, from_tz_str: str, to_tz_str: str):
+		"Get the datetime for the given week day and time in the user's timezone"
+		
+		to_tz = pytz.timezone(to_tz_str)
+		from_tz = pytz.timezone(from_tz_str)
 
-    # Adjust today's date to the start of the current week (Monday)
-    start_of_week = now.date() - datetime.timedelta(days=now.weekday())
+		# Get start of the week
+		now = datetime.now(from_tz)
+		start_of_week = now.date() - timedelta(days=now.weekday())
 
-    # Get the day and time of the anime broadcast
-    day_num = WEEK_DAYS.index(day_str.rstrip('s'))  # Remove 's' from the end of the day to make it singular
-    time = datetime.time.fromisoformat(time_str)
+		# Get the day and time
+		day_num = WEEK_DAYS.index(week_day)
+		air_at = datetime.combine(start_of_week + timedelta(days=day_num), time)
 
-    # Create a full datetime for the anime broadcast
-    broadcast = datetime.datetime.combine(start_of_week + datetime.timedelta(days=day_num), time)
+		# Localize the datetime to the JST timezone
+		air_at = from_tz.localize(air_at)
 
-    # Localize the datetime to the JST timezone
-    # TODO localize to the anime's timezone
-    broadcast = jst_tz.localize(broadcast)
+		# Normalize the datetime to handle daylight saving time transitions
+		air_at = from_tz.normalize(air_at)
 
-    # Normalize the datetime to handle daylight saving time transitions
-    broadcast = jst_tz.normalize(broadcast)
+		# Convert the datetime to the local timezone
+		return air_at.astimezone(to_tz)
 
-    # Convert the datetime to the local timezone
-    return broadcast.astimezone(tzlocal())
+	# Build the schedule with the user timezone
+	def from_user_animes(user_animes: pl.LazyFrame):
+		default_tz = "Asia/Tokyo"
+		fake_user_tz = "Europe/Paris"
 
-def create_schedule(schedule: List[Dict]) -> pd.DataFrame:
-    """Creates a DataFrame from the given schedule sorted by day of the week and time."""
-    df_schedule = pd.DataFrame(schedule)
+		# Filter the animes that are currently airing and the user is watching
+		schedule_df = user_animes.filter((pl.col("user_watch_status") == "Watching") & (pl.col("air_status") == "Currently Airing")).select(
+			"title",
+			"air_day",
+			"air_time",
+			"air_tz",
+		).collect()
+		# print_df(schedule, "Schedule")
 
-    # If the DataFrame is empty, return an empty DataFrame
-    if df_schedule.empty:
-        return None
+		# Build the schedule from the filtered animes
+		schedule = {day: [] for day in WEEK_DAYS}
+		for row in schedule_df.rows(named=True):
+			dt: datetime = Schedule.get_dt(row["air_day"], row["air_time"], row.get("air_tz", default_tz), fake_user_tz)
+			air_day = dt.strftime("%A")
+			schedule[air_day].append({"title": row["title"], "datetime": dt})
+		
+		# Sort the schedule days by time of airing
+		for animes in schedule.values():
+			animes.sort(key=lambda x: x["datetime"])
 
-    # Sort the DataFrame by day of the week and time
-    df_schedule = df_schedule.sort_values(['day', 'time'])
+		return Schedule(schedule)
 
-    # Group the DataFrame by day and create the schedule for each day
-    schedule_by_day = defaultdict(list)
-    for _, row in df_schedule.iterrows():
-        schedule_by_day[row['day']].append(f"{row['time'].strftime('%H:%M')} {row['title']}")
+	def _repr_html_(self):
+		max_animes = max(len(animes) for animes in self.schedule.values())
 
-    # Find the maximum number of animes airing on a single day
-    max_len = max(len(v) for v in schedule_by_day.values())
+		# Start the table and add the header row
+		html = "<h3>Schedule</h3>"
+		html += "<table><tr>"
+		for day in WEEK_DAYS:
+			html += f"<th>{day}</th>"
+		html += "</tr>"
 
-    # Extend the lists of other days with empty strings until they match the maximum length
-    for day in WEEK_DAYS:
-        schedule_by_day[day].extend([''] * (max_len - len(schedule_by_day[day])))
+		# Add rows for each time slot
+		for i in range(max_animes):
+			html += "<tr>"
+			for day in WEEK_DAYS:
+				if i < len(self.schedule[day]):
+					anime = self.schedule[day][i]
+					html += f"<td>{anime['datetime'].strftime('%H:%M')} - {anime['title']}</td>"
+				else:
+					html += "<td></td>"  # Empty cell if no anime at this index for the day
+			html += "</tr>"
+		html += "</table>"
 
-    # Create a DataFrame for the schedule
-    df_schedule_by_day = pd.DataFrame(dict(schedule_by_day))
-    df_schedule_by_day = df_schedule_by_day.reindex(WEEK_DAYS, axis=1)  # Reorder the columns by day of the week
-
-    return df_schedule_by_day
-
-# TODO return html table
-def get_schedule(animes):
-    # Extract airing schedule for the animes being watched
-    schedule = []
-    for anime in get_watching_animes(animes):
-        if 'broadcast' in anime and 'day' in anime['broadcast'] and 'time' in anime['broadcast']:
-            broadcast_local = convert_to_local_time(anime['broadcast']['day'], anime['broadcast']['time'])
-
-            title = anime.get('title_english') or anime.get('title')  # Default to 'title' if 'title_english' is None
-
-            schedule.append({
-                'title': title,
-                'day': WEEK_DAYS[broadcast_local.weekday()],
-                'time': broadcast_local.time()
-            })
-
-    # Create the schedule DataFrame
-    df_schedule = create_schedule(schedule)
-
-    return df_schedule
+		return html
