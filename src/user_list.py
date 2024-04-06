@@ -52,7 +52,7 @@ def clean_user_list(user_list: pl.LazyFrame) -> pl.LazyFrame:
 	# Set some columns to null if they're empty
 	user_list = user_list.with_columns([
 		pl.col(col).replace("", None)
-		for col in ["user_storage", "user_priority", "notes", "editable_notes", "tags"]
+		for col in ["user_storage", "user_priority", "user_notes", "user_editable_notes", "user_tags"]
 	])
 
 	# Convert status & priority to enums
