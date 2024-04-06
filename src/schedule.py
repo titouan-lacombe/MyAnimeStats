@@ -63,8 +63,7 @@ class Schedule:
 		max_animes = max(len(animes) for animes in self.schedule.values())
 
 		# Start the table and add the header row
-		html = "<h3>Schedule</h3>"
-		html += "<table><tr>"
+		html = "<table><tr>"
 		for day in WEEK_DAYS:
 			html += f"<th>{day}</th>"
 		html += "</tr>"
