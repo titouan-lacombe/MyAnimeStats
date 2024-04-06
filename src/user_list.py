@@ -1,5 +1,6 @@
 import httpx
 import polars as pl
+from io import TextIOWrapper
 from src.log import logger
 
 log = logger.getChild(__name__)
@@ -32,6 +33,9 @@ USER_LIST_SCHEMA = {
 class UserList:
 	def __init__(self, df: pl.LazyFrame):
 		self.df = df
+
+	def get_df(self):
+		return self.df.collect()
 
 	def clean(self):
 		# Cast to the correct types & select only the necessary columns
@@ -81,40 +85,45 @@ class UserList:
 
 		return self.df
 
-	async def from_web(user, http_client: httpx.AsyncClient):
+	async def from_web(user: str, http_client: httpx.AsyncClient):
 		"Scrapes the user's anime list from the web"
 
-		start_offset = 0
+		# Hardcoded but no choice
+		mal_chunk_size = 300
 
+		total_entries = 0
 		df = pl.DataFrame()
+
 		while True:
-			log.info(f"Scraping user web list with offset {start_offset}...")
+			log.info(f"Scraping web list with offset {total_entries}...")
+
+			# TODO custom error for 404 (user not found)
 			response = await http_client.get(f"https://myanimelist.net/animelist/{user}/load.json", params={
-				"offset": start_offset,
-				'status': 7,
+				"offset": total_entries,
+				'status': 7, # All statuses
 			})
 			response.raise_for_status()
 			entries = response.json()
 
 			# Increment the offset
-			data_length = len(entries)
-			start_offset += data_length
+			new_entries = len(entries)
+			total_entries += new_entries
+
+			# Append the new entries to the dataframe
+			df = df.vstack(pl.DataFrame(entries))
 
 			# Check if we're done
-			if data_length == 0:
-				log.info(f"Finished scraping user web list ({start_offset} total entries)")
+			if new_entries < mal_chunk_size:
+				log.info(f"Finished scraping user web list ({total_entries} total entries)")
 				break
 
-			df = pl.DataFrame(entries)
-			df = df.vstack(df)
-
 		df.rechunk()
-		user_list = UserList(df)
-		user_list.clean()
 
+		user_list = UserList(df.lazy())
+		user_list.clean()
 		return user_list
 
-	def from_xml(file):
+	def from_xml(file: TextIOWrapper):
 		"Loads the user's anime list from a MAL XML export file"
 		# TODO: Implement from_xml
 		raise NotImplementedError
