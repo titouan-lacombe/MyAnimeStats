@@ -42,14 +42,13 @@ class Schedule:
 		return air_at.astimezone(to_tz)
 
 	# Finish building the schedule with the user timezone
-	def from_df(schedule_df: pl.DataFrame):
+	def from_df(schedule_df: pl.DataFrame, user_tz: str):
 		default_tz = "Asia/Tokyo"
-		fake_user_tz = "Europe/Paris"
 
 		# Build the schedule from the filtered animes
 		schedule = {day: [] for day in WEEK_DAYS}
 		for row in schedule_df.rows(named=True):
-			dt: datetime = Schedule.get_dt(row["air_day"], row["air_time"], row.get("air_tz", default_tz), fake_user_tz)
+			dt: datetime = Schedule.get_dt(row["air_day"], row["air_time"], row.get("air_tz", default_tz), user_tz)
 			air_day = dt.strftime("%A")
 			schedule[air_day].append({"title": row["title"], "datetime": dt})
 		

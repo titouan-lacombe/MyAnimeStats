@@ -1,5 +1,4 @@
-import logging
-import httpx
+import logging, httpx
 import polars as pl
 from io import TextIOWrapper
 
@@ -79,7 +78,7 @@ class UserList:
 
 		return df
 
-	async def from_user_name(http_client: httpx.AsyncClient, user: str) -> pl.DataFrame:
+	async def from_user_name(http_client: httpx.AsyncClient, user: str):
 		"Scrapes the user's anime list from the web"
 
 		# Hardcoded but no choice

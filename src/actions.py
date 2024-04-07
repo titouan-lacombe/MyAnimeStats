@@ -20,7 +20,7 @@ def get_user_animes(user_list: pl.DataFrame):
 
 	return user_animes
 
-def get_stats(user_animes: pl.DataFrame):
+def get_stats(user_animes: pl.DataFrame, user_tz: str):
 	user_animes = user_animes.lazy()
 
 	# Get all lazy stats
@@ -35,6 +35,6 @@ def get_stats(user_animes: pl.DataFrame):
 	stats = {name: collected for name, collected in zip(stats_order, collected_stats)}
 
 	# Finish building the schedule
-	stats["schedule"] = Schedule.from_df(stats["schedule"])
+	stats["schedule"] = Schedule.from_df(stats["schedule"], user_tz)
 
 	return stats
