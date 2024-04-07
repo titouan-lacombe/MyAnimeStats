@@ -1,12 +1,13 @@
 import logging
 import polars as pl
+from pathlib import Path
 from .schedule import Schedule
 from .next_releases import NextReleases
 
 logger = logging.getLogger(__name__)
 
-def get_user_animes(user_list: pl.DataFrame):
-	anime_db = pl.scan_parquet("data/anime.parquet")
+def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
+	anime_db = pl.scan_parquet(anime_db_file)
 
 	common_cols = set(user_list.columns).intersection(anime_db.columns).difference(["anime_id"])
 	if len(common_cols) > 0:
