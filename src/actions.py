@@ -24,22 +24,17 @@ def get_stats(user_animes: pl.DataFrame):
 	user_animes = user_animes.lazy()
 
 	# Get all lazy stats
-	lazy_schedule_data = Schedule.get(user_animes)
-	lazy_next_releases = NextReleases.get(user_animes)
+	lazy_stats = {
+		"schedule": Schedule.get(user_animes),
+		"next_releases": NextReleases.get(user_animes),
+	}
 
 	# Collect all stats in parallel
-	[
-		schedule_data,
-		next_releases,
-	] = pl.collect_all([
-		lazy_schedule_data,
-		lazy_next_releases,
-	])
+	stats_order = list(lazy_stats.keys())
+	collected_stats = pl.collect_all([lazy_stats[stat] for stat in stats_order])
+	stats = {name: collected for name, collected in zip(stats_order, collected_stats)}
 
 	# Finish building the schedule
-	schedule = Schedule.from_df(schedule_data)
+	stats["schedule"] = Schedule.from_df(stats["schedule"])
 
-	return {
-		"schedule": schedule,
-		"next_releases": next_releases,
-	}
+	return stats
