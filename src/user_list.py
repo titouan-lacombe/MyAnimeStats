@@ -1,9 +1,9 @@
+import logging
 import httpx
 import polars as pl
 from io import TextIOWrapper
-from src.log import logger
 
-log = logger.getChild(__name__)
+logger = logging.getLogger(__name__)
 
 STATUS_MAP = {
 	1: "Watching",
@@ -31,18 +31,12 @@ USER_LIST_SCHEMA = {
 }
 
 class UserList:
-	def __init__(self, df: pl.LazyFrame):
-		self.df = df
-
-	def get_df(self):
-		return self.df.collect()
-
-	def clean(self):
+	def clean(df: pl.LazyFrame) -> pl.LazyFrame:
 		# Cast to the correct types & select only the necessary columns
-		self.df = self.df.select(USER_LIST_SCHEMA.keys()).cast(USER_LIST_SCHEMA)
+		df = df.select(USER_LIST_SCHEMA.keys()).cast(USER_LIST_SCHEMA)
 
 		# Rename columns to avoid conflicts with other tables & prettier
-		self.df = self.df.rename({
+		df = df.rename({
 			"score": "user_scored",
 			"status": "user_watch_status",
 			"start_date_string": "user_watch_start",
@@ -58,34 +52,34 @@ class UserList:
 		})
 
 		# Drop redundant columns
-		self.df = self.df.drop("days_string")
+		df = df.drop("days_string")
 
 		# Set some columns to null if they're empty
-		self.df = self.df.with_columns([
+		df = df.with_columns([
 			pl.col(col).replace("", None)
 			for col in ["user_storage", "user_priority", "user_notes", "user_editable_notes", "user_tags"]
 		])
 
 		# Score 0 means no score
-		self.df = self.df.with_columns(
+		df = df.with_columns(
 			user_scored = pl.col("user_scored").replace(0, None),
 		)
 
 		# Convert status & priority to enums
-		self.df = self.df.with_columns(
+		df = df.with_columns(
 			user_watch_status = pl.col("user_watch_status").replace(STATUS_MAP).cast(pl.Enum(STATUS_MAP.values())),
 			user_priority = pl.col("user_priority").cast(pl.Enum(["Low", "Medium", "High"])),
 		)
 
 		# Parse dates
-		self.df = self.df.with_columns([
+		df = df.with_columns([
 			pl.col(col).str.to_date("%d-%m-%y")
 			for col in ["user_watch_start", "user_watch_end"]
 		])
 
-		return self.df
+		return df
 
-	async def from_web(user: str, http_client: httpx.AsyncClient):
+	async def from_user_name(http_client: httpx.AsyncClient, user: str) -> pl.DataFrame:
 		"Scrapes the user's anime list from the web"
 
 		# Hardcoded but no choice
@@ -95,7 +89,7 @@ class UserList:
 		df = pl.DataFrame()
 
 		while True:
-			log.info(f"Scraping web list with offset {total_entries}...")
+			logger.info(f"Scraping web list with offset {total_entries}...")
 
 			# TODO custom error for 404 (user not found)
 			response = await http_client.get(f"https://myanimelist.net/animelist/{user}/load.json", params={
@@ -114,16 +108,14 @@ class UserList:
 
 			# Check if we're done
 			if new_entries < mal_chunk_size:
-				log.info(f"Finished scraping user web list ({total_entries} total entries)")
+				logger.info(f"Finished scraping user web list ({total_entries} total entries)")
 				break
 
 		df.rechunk()
+		cleaned: pl.DataFrame = UserList.clean(df.lazy()).collect()
+		return cleaned
 
-		user_list = UserList(df.lazy())
-		user_list.clean()
-		return user_list
-
-	def from_xml(file: TextIOWrapper):
+	def from_xml(file: TextIOWrapper) -> pl.DataFrame:
 		"Loads the user's anime list from a MAL XML export file"
 		# TODO: Implement from_xml
 		raise NotImplementedError
