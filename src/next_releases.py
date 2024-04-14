@@ -4,7 +4,9 @@ import polars as pl
 class NextReleases:
 	def get(user_animes: pl.LazyFrame):
 		return user_animes.filter(
-			(pl.col("user_watch_status") == "Plan to Watch") & (pl.col("air_status") == "Not yet aired")
+			(pl.col("user_watch_status") == "Plan to Watch")
+			& (pl.col("air_status") == "Not yet aired")
+			& (pl.col("air_start").is_not_null())
 		).sort("air_start", nulls_last=True).select(
 			"title",
 			# "air_start",
