@@ -13,11 +13,11 @@ STATUS_MAP = {
 }
 
 USER_LIST_SCHEMA = {
-	"anime_id": pl.Int64,
-	"status": pl.Int8,
-	"score": pl.Int8,
+	"anime_id": pl.UInt64,
+	"status": pl.UInt8,
+	"score": pl.UInt8,
 	"is_rewatching": pl.Boolean,
-	"num_watched_episodes": pl.Int16,
+	"num_watched_episodes": pl.UInt16,
 	"is_added_to_list": pl.Boolean,
 	"start_date_string": pl.String,
 	"finish_date_string": pl.String,
