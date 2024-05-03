@@ -24,7 +24,7 @@ def get_user_franchises(user_animes: pl.DataFrame):
 		sum("episodes"),
 		sum("user_watch_episodes"),
 		weighted_mean("scored_avg", "episodes"),
-		weighted_mean("user_scored", "episodes"),
+		weighted_mean("user_scored", "episodes").replace(0, None),
 		union("genres"),
 		union("themes"),
 		union("demographics"),
