@@ -6,7 +6,7 @@ refactor codebase:
 - use polars
 
 convert data manip to JS? or intermediate data format sent to frontend?
-make graphs & frontend with d3.js? or other?
+make graphs & frontend with d3.js? or other? (https://streamlit.io/ ?)
 
 build backend api with a real db?
 
