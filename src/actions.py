@@ -19,16 +19,6 @@ def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
 		missing_animes = user_list.join(user_animes, "anime_id", "anti")
 		logger.warning(f"{missing_animes.height} anime not found in database: {missing_animes.head(10)}")
 
-	# Calculate user_watch_duration
-	user_animes = user_animes.with_columns(
-		user_watch_duration = pl.duration(
-			seconds=pl.col("episode_avg_duration").dt.total_seconds() * pl.col("user_watch_episodes")
-		).replace(0, None),
-		total_duration = pl.duration(
-			seconds=pl.col("episode_avg_duration").dt.total_seconds() * pl.col("episodes")
-		).replace(0, None),
-	)
-
 	return user_animes
 
 def get_stats(user_animes: pl.DataFrame, user_franchises: pl.DataFrame, user_tz: str):
