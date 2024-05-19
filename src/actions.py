@@ -9,11 +9,12 @@ logger = logging.getLogger(__name__)
 def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
 	anime_db = pl.scan_parquet(anime_db_file)
 
-	common_cols = set(user_list.columns).intersection(anime_db.columns).difference(["anime_id"])
-	if len(common_cols) > 0:
-		raise Exception(f"Common columns found between user_list and anime_db: {common_cols}")
-
-	user_animes = user_list.lazy().join(anime_db, on="anime_id", how="inner", validate="1:1").collect()
+	user_animes = user_list.lazy().join(
+		anime_db,
+		on="anime_id",
+		how="inner",
+		validate="1:1"
+	).collect()
 
 	if user_animes.height < user_list.height:
 		missing_animes = user_list.join(user_animes, "anime_id", "anti")
