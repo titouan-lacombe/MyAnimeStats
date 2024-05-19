@@ -12,7 +12,6 @@ def sum(col):
 def weighted_mean(col, wh_col):
 	return ((pl.col(col) * pl.col(wh_col)).sum() / pl.col(wh_col).sum()).fill_nan(None).alias(col)
 
-# TODO change total_duration_sec to episode_avg_duration so we can calculate user_watch_duration
 def get_user_franchises(user_animes: pl.DataFrame):
 	# Default franchise
 	user_animes = user_animes.lazy().with_columns(
@@ -36,7 +35,8 @@ def get_user_franchises(user_animes: pl.DataFrame):
 		union("type"),
 		pl.col("sfw").all().alias("sfw"),
 		pl.col("user_rewatching").any().alias("user_rewatching"),
-		sum("total_duration_sec"),
+		sum("user_watch_duration"),
+		sum("total_duration"),
 		pl.col("anime_id"),
 	).sort("user_scored", descending=True, nulls_last=True)
 
