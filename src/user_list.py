@@ -90,11 +90,13 @@ class UserList:
 		while True:
 			logger.info(f"Scraping web list with offset {total_entries}...")
 
-			# TODO custom error for 404 (user not found)
 			response = await http_client.get(f"https://myanimelist.net/animelist/{user}/load.json", params={
 				"offset": total_entries,
 				'status': 7, # All statuses
 			})
+			if response.status_code == 400:
+				# Custom error for user not found
+				raise ValueError(f"User {user} may not exist")
 			response.raise_for_status()
 			entries = response.json()
 
