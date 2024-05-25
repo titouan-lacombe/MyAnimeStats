@@ -1,6 +1,3 @@
-MyAnimeStats V2:
-- cleanup/save old V1 code
-
 MyAnimeStats V3:
 - build api with fastapi & jinja2
 - pretty landing page (static html, render jinja at startup, serve with nginx or starlette static files?)
