@@ -23,7 +23,11 @@ templates = Jinja2Templates(
 async def home():
 	return {"message": "Hello, world!"}
 
-@app.exception_handler(404)
+@app.get("/stats/{username}")
+async def stats(username: str):
+	return {"username": username}
+
+@app.exception_handler(status.HTTP_404_NOT_FOUND)
 async def not_found_error(request: Request, exc: HTTPException):
     return templates.TemplateResponse(
         request,
