@@ -1,5 +1,6 @@
 import logging, pprint
 from fastapi import Request, HTTPException, status, FastAPI
+from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 from pathlib import Path
@@ -11,9 +12,10 @@ config = AppConfig.from_env()
 logger.info(f"Worker loaded configuration:\n{pprint.pformat(config.model_dump())}")
 
 parent_dir = Path(__file__).parent
+static_dir = parent_dir / "static"
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory=parent_dir / "static"), name="static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 templates = Jinja2Templates(
     directory=parent_dir / "templates"
@@ -22,6 +24,13 @@ templates = Jinja2Templates(
 @app.get("/")
 async def home():
 	return {"message": "Hello, world!"}
+
+@app.get("/favicon.ico")
+async def favicon():
+	return FileResponse(
+		static_dir / "favicon.png",
+		media_type="image/x-icon"
+	)
 
 @app.get("/stats/{username}")
 async def stats(username: str):
