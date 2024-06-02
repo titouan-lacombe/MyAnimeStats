@@ -1,5 +1,5 @@
 <div align="center">
-  <img alt="logo" height="256px" src="./images/logo.png">
+  <img alt="logo" height="256px" src="./src/static/logo.png">
 </div>
 
 # MyAnimeStats

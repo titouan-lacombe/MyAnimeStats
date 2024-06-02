@@ -22,8 +22,8 @@ templates = Jinja2Templates(
 )
 
 @app.get("/")
-async def home():
-	return {"message": "Hello, world!"}
+async def home(request: Request):
+	return templates.TemplateResponse(request, "home.html.j2")
 
 @app.get("/favicon.ico")
 async def favicon():
@@ -32,9 +32,15 @@ async def favicon():
 		media_type="image/x-icon"
 	)
 
-@app.get("/stats/{username}")
-async def stats(username: str):
-	return {"username": username}
+@app.get("/analyse")
+async def stats(request: Request, username: str):
+	return templates.TemplateResponse(
+		request,
+		"analyse.html.j2",
+		{
+			"username": username
+		}
+	)
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
 async def not_found_error(request: Request, exc: HTTPException):
