@@ -3,7 +3,7 @@ COMPOSE=docker compose
 default: up
 
 mkdata:
-	@mkdir -p data data
+	@mkdir -p data data/app
 
 build:
 	@$(COMPOSE) build
