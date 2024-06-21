@@ -29,6 +29,9 @@ USER_LIST_SCHEMA = {
 	"tags": pl.String,
 }
 
+class UserNotFound(Exception):
+	pass
+
 class UserList:
 	def clean(df: pl.LazyFrame) -> pl.LazyFrame:
 		# Cast to the correct types & select only the necessary columns
@@ -78,7 +81,7 @@ class UserList:
 
 		return df
 
-	async def from_user_name(http_client: httpx.AsyncClient, user: str):
+	def from_user_name(http_client: httpx.Client, user: str):
 		"Scrapes the user's anime list from the web"
 
 		# Hardcoded but no choice
@@ -90,13 +93,12 @@ class UserList:
 		while True:
 			logger.info(f"Scraping web list with offset {total_entries}...")
 
-			response = await http_client.get(f"https://myanimelist.net/animelist/{user}/load.json", params={
+			response = http_client.get(f"https://myanimelist.net/animelist/{user}/load.json", params={
 				"offset": total_entries,
 				'status': 7, # All statuses
 			})
 			if response.status_code == 400:
-				# Custom error for user not found
-				raise ValueError(f"User {user} may not exist")
+				raise UserNotFound
 			response.raise_for_status()
 			entries = response.json()
 

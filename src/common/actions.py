@@ -7,7 +7,9 @@ from .next_releases import NextReleases
 logger = logging.getLogger(__name__)
 
 def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
-	anime_db = pl.scan_parquet(anime_db_file)
+	anime_db = pl.scan_parquet(anime_db_file).cast({
+		"anime_id": pl.UInt64,
+	})
 
 	user_animes = user_list.lazy().join(
 		anime_db,
