@@ -17,6 +17,7 @@ user_name = st.session_state.get("user_name", "")
 user_name = col1.text_input("Please provide your MyAnimeList username", user_name)
 st.session_state["user_name"] = user_name
 
+# TODO get user timezone using js
 timezones = list(sorted(pytz.all_timezones))
 local_tz = col2.selectbox("Please select your local timezone", timezones, index=timezones.index("UTC"))
 
@@ -43,3 +44,7 @@ if st.button("Analyse"):
 	
 	st.write("## Favourite franchises")
 	st.dataframe(stats["favorite_franchises"])
+
+	# TODO: fix rendering
+	# st.write("## Air schedule")
+	# st.table(stats["air_schedule"])

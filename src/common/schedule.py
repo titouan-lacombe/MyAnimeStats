@@ -15,9 +15,6 @@ class Schedule:
 			"air_tz",
 		)
 
-	def __init__(self, schedule: dict[str, list[dict[str, any]]]):
-		self.schedule = schedule
-
 	def get_dt(week_day: str, time: time, from_tz_str: str, to_tz_str: str):
 		"Get the datetime for the given week day and time in the user's timezone"
 		
@@ -56,27 +53,4 @@ class Schedule:
 		for animes in schedule.values():
 			animes.sort(key=lambda x: x["datetime"])
 
-		return Schedule(schedule)
-
-	def _repr_html_(self):
-		max_animes = max(len(animes) for animes in self.schedule.values())
-
-		# Start the table and add the header row
-		html = "<table><tr>"
-		for day in WEEK_DAYS:
-			html += f"<th>{day}</th>"
-		html += "</tr>"
-
-		# Add rows for each time slot
-		for i in range(max_animes):
-			html += "<tr>"
-			for day in WEEK_DAYS:
-				if i < len(self.schedule[day]):
-					anime = self.schedule[day][i]
-					html += f"<td>{anime['datetime'].strftime('%H:%M')} - {anime['title']}</td>"
-				else:
-					html += "<td></td>"  # Empty cell if no anime at this index for the day
-			html += "</tr>"
-		html += "</table>"
-
-		return html
+		return schedule
