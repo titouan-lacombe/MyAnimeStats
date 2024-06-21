@@ -9,6 +9,6 @@ services:
       LOG_LEVEL: DEBUG
     volumes:
       - ./src:/app/src
-      - ./data/app:/app/data
+      - ./data:/app/data
     ports:
       - 8000:8000

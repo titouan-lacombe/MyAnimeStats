@@ -3,7 +3,7 @@ COMPOSE=docker compose
 default: up
 
 mkdata:
-	@mkdir -p data data/app
+	@mkdir -p data data
 
 build:
 	@$(COMPOSE) build
@@ -30,7 +30,4 @@ logs:
 	@$(COMPOSE) logs app -f --tail=100
 
 attach:
-	@$(COMPOSE)exec app bash
-
-notebook:
-	@pdm run jupyter notebook my_anime_stats.ipynb
+	@$(COMPOSE) exec app bash

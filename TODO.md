@@ -1,9 +1,6 @@
 MyAnimeStats V3:
-- build api with fastapi & jinja2
 - compare bokeh vs https://altair-viz.github.io/
-- streamlit for frontend?
-- pretty landing page (static html, render jinja at startup, serve with nginx or starlette static files?)
-- basic frontend by directly downloading rendered bokeh html plots & tables?
+- pretty landing page
 - stats i could add:
   - episodes watched (total time)
   - franchises watched / franchises to watch (will need relational data if we want better stats)
