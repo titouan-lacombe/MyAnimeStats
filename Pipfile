@@ -5,12 +5,10 @@ name = "pypi"
 
 [packages]
 pyarrow = "*"
-polars = {extras = ["plot"] }
-rich = "*"
+polars = "*"
 httpx = "*"
-tzlocal = "*"
-fastapi = "*"
-gunicorn = "*"
+streamlit = "*"
+altair = "*"
 
 [dev-packages]
 

@@ -20,5 +20,9 @@ RUN pipenv sync -v --system --clear && pipenv --clear
 # Copy the current directory contents into the container at /app
 COPY src ./src
 
+# Streamlit configuration
+RUN mkdir -p .streamlit
+COPY streamlit.toml .streamlit/config.toml
+
 # Run the application
-CMD [ "gunicorn", "-c", "src/gunicorn.conf.py" ]
+CMD [ "streamlit", "run", "src/MyAnimeStats.py" ]
