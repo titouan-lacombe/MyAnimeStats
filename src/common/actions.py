@@ -16,6 +16,9 @@ def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
 		on="anime_id",
 		how="inner",
 		validate="1:1"
+	).with_columns(
+		# TODO better handling of localized titles
+		title_localized = pl.col("title_english").fill_null(pl.col("title")),
 	).collect()
 
 	if user_animes.height < user_list.height:

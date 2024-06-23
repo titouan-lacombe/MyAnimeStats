@@ -9,7 +9,7 @@ class Schedule:
 		return user_animes.filter(
 			(pl.col("user_watch_status") == "Watching") & (pl.col("air_status") == "Currently Airing")
 		).select(
-			"title",
+			"title_localized",
 			"air_day",
 			"air_time",
 			"air_tz",
@@ -47,7 +47,7 @@ class Schedule:
 		for row in schedule_df.rows(named=True):
 			dt: datetime = Schedule.get_dt(row["air_day"], row["air_time"], row.get("air_tz", default_tz), user_tz)
 			air_day = dt.strftime("%A")
-			schedule[air_day].append({"title": row["title"], "datetime": dt})
+			schedule[air_day].append({"title": row["title_localized"], "datetime": dt})
 		
 		# Sort the schedule days by time of airing
 		for animes in schedule.values():

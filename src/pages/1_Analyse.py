@@ -84,7 +84,7 @@ if st.button("Analyse"):
 			x=alt.X('air_start:T', title='Air Year'),
 			y=alt.Y('user_scored:Q', title='Score', scale=alt.Scale(domain=(0, 10))),
 			tooltip=[
-				alt.Tooltip('title_english:N', title='Title'),
+				alt.Tooltip('title_localized:N', title='Title'),
 				alt.Tooltip('user_scored:Q', title='Score'),
 				alt.Tooltip('air_start:T', title='Air Start')
 			]
@@ -185,7 +185,7 @@ if st.button("Analyse"):
 	st.write("## Most unpopular opinions")
 
 	col1, col2 = st.columns(2)
-	col1.dataframe(unpopular_data.select("title_english", "score_difference", "scored_avg", "user_scored"))
+	col1.dataframe(unpopular_data.select("title_localized", "score_difference", "scored_avg", "user_scored"))
 
 	# normie_ness = 1 - (unpopular_data.get_column("score_difference_abs").mean() * 2)
 	# print(f"[green]Normie-ness: {normie_ness:.2%}[/green]")
@@ -223,7 +223,7 @@ if st.button("Analyse"):
 			y=alt.Y('user_scored_scaled:Q', title='User Score'),
 			color=alt.Color('color:N', scale=None),
 			tooltip=[
-				alt.Tooltip('title_english:N', title='Title'),
+				alt.Tooltip('title_localized:N', title='Title'),
 				alt.Tooltip('scored_avg:Q', title='MyAnimeList Score'),
 				alt.Tooltip('user_scored:Q', title='User Score'),
 				alt.Tooltip('score_difference:Q', title='Normed Score Diff (%)')

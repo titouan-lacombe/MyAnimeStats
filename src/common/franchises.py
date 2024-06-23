@@ -15,12 +15,12 @@ def weighted_mean(col, wh_col):
 def get_user_franchises(user_animes: pl.DataFrame):
 	# Fake franchises
 	user_animes = user_animes.with_columns(
-		franchise = pl.col("title_english").fill_null(pl.col("title")),
+		franchise = pl.col("title_localized"),
 	)
 
 	# Default franchise
 	lazy_user_animes = user_animes.lazy().with_columns(
-		pl.col("franchise").fill_null(pl.col("title")),
+		pl.col("franchise").fill_null(pl.col("title_localized")),
 	)
 
 	# Calculate user_watch_duration and total_duration
