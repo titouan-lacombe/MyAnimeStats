@@ -22,7 +22,7 @@ timezones = list(sorted(pytz.all_timezones))
 local_tz = col2.selectbox("Local timezone", timezones, index=timezones.index("UTC"))
 
 @st.cache_data(show_spinner=False)
-def analyse(user_name: str):
+def analyse(user_name: str, local_tz: str):
 	with httpx.Client() as client:
 		user_list = UserList.from_user_name(client, user_name)
 	user_animes = get_user_animes(user_list, anime_db_path)
@@ -37,7 +37,7 @@ if st.button("Analyse"):
 
 	with st.spinner("Analysing..."):
 		try:
-			stats = analyse(user_name)
+			stats = analyse(user_name, local_tz)
 		except UserNotFound:
 			st.error(f"User '{user_name}' not found")
 			st.stop()
