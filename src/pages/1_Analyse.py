@@ -13,7 +13,7 @@ set_page_config(
 	layout="wide",
 )
 
-st.title("Analyse")
+st.title("List Analysis")
 
 col1, col2, _ = st.columns([1, 1, 4])
 user_name = st.session_state.get("user_name", "")
@@ -33,12 +33,12 @@ def analyse(user_name: str, local_tz: str):
 	stats = get_stats(user_animes, user_franchises, local_tz)
 	return stats, user_franchises, user_animes
 
-if st.button("Analyse"):
+if st.button("Launch analysis"):
 	if not user_name:
 		st.error("Please provide your MyAnimeList username")
 		st.stop()
 
-	with st.spinner("Analysing..."):
+	with st.spinner("Working..."):
 		try:
 			stats, user_franchises, user_animes = analyse(user_name, local_tz)
 		except UserNotFound:
