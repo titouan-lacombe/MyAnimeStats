@@ -45,13 +45,15 @@ if st.button("Launch analysis"):
 			st.error(f"User '{user_name}' not found (your list might be private)")
 			st.stop()
 	
-	st.write(f"## Air schedule (in {local_tz})")
+	st.write(f"## Current air schedule")
+	st.write(f"Times are in {local_tz} timezone")
 	st.dataframe(
 		stats["air_schedule"],
 		hide_index=True,
 	)
 
 	st.write("## Favourite franchises")
+	st.write("What do you like the most?")
 	st.dataframe(
 		stats["favorite_franchises"],
 		hide_index=True,
@@ -60,6 +62,8 @@ if st.button("Launch analysis"):
 	col1, col2 = st.columns(2)
 
 	# TODO title_localized: title_english or title_japanese
+	col1.write("## Franchises score distribution")
+	col1.write("How do you score anime compared to the MAL users?")
 	col1.altair_chart(
 		alt.Chart(
 			user_animes.filter(pl.col('scored_avg').is_not_null() & pl.col('user_scored').is_not_null())
@@ -82,12 +86,13 @@ if st.button("Launch analysis"):
 				)
 			)
 		).properties(
-			title='Franchises Score Distribution',
 			width=800,
 			height=500
 		).interactive()
 	)
 
+	col2.write("## User score distribution by air year")
+	col2.write("Are you biased towards newer animes?")
 	col2.altair_chart(
 		alt.Chart(user_animes).mark_point().encode(
 			x=alt.X('air_start:T', title='Air Year'),
@@ -98,12 +103,12 @@ if st.button("Launch analysis"):
 				alt.Tooltip('air_start:T', title='Air Start')
 			]
 		).properties(
-			title='User Score Distribution by Air Year',
 			width=800,
 			height=500
 		).interactive()
 	)
 
+	# TODO sort by median score
 	def score_box_plot(key: str, col):
 		threshold = 8
 		box_data = user_animes.filter(
@@ -126,12 +131,15 @@ if st.button("Launch analysis"):
 					alt.Tooltip('user_scored:Q', title='Score')
 				],
 			).properties(
-				title=f'User Score Distribution by {key.capitalize()}',
+				title=key.capitalize(),
 				width=800,
 				height=500
 			)
 		)
 
+	st.write("## User score distribution by genres, themes, studios and demographics")
+	st.write("What variables influence your scoring?")
+	col1, col2 = st.columns(2)
 	score_box_plot('genres', col1)
 	score_box_plot('themes', col2)
 	score_box_plot('studios', col1)
@@ -153,9 +161,9 @@ if st.button("Launch analysis"):
 		score_difference_abs = pl.col('score_difference').abs()
 	).sort("score_difference_abs", descending=True)
 
-	st.write("## Most unpopular opinions")
-
 	col1, col2 = st.columns(2)
+	col1.write("## Most unpopular opinions")
+	col1.write("Do you have any hot takes?")
 	col1.dataframe(
 		unpopular_data.select("title_localized", "score_difference", "scored_avg", "user_scored"),
 		hide_index=True,
@@ -173,6 +181,8 @@ if st.button("Launch analysis"):
 		)
 	)
 
+	col2.write("## User score vs MyAnimeList score")
+	col2.write("Do you agree with the general public? Or are you going against the flow?")
 	col2.altair_chart(
 		alt.Chart(unpopular_data_colored).mark_circle().encode(
 			x=alt.X('scored_avg_scaled:Q', title='MyAnimeList Score'),
@@ -185,7 +195,6 @@ if st.button("Launch analysis"):
 				alt.Tooltip('score_difference:Q', title='Normed Score Diff (%)')
 			]
 		).properties(
-			title='User Score vs MyAnimeList Score',
 			width=800,
 			height=800
 		).interactive()
@@ -229,11 +238,14 @@ if st.button("Launch analysis"):
 					alt.Tooltip('feature2:N', title='Feature 2')
 				]
 			).properties(
-				title=f"{feature.capitalize()} Co-occurrence Matrix",
+				title=feature.capitalize(),
 				width=800,
 				height=800
 			)
 		)
+
+	st.write("## Co-occurrence charts")
+	st.write("What genres and themes combinations do you watch the most?")
 
 	col1, col2 = st.columns(2)
 	draw_co_occurrence('genres', col1)
