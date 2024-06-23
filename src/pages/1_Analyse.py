@@ -118,7 +118,6 @@ if st.button("Launch analysis"):
 		).interactive()
 	)
 
-	# TODO sort by median score
 	def score_box_plot(key: str, col):
 		threshold = 8
 		box_data = user_animes.filter(
@@ -134,7 +133,7 @@ if st.button("Launch analysis"):
 
 		col.altair_chart(
 			alt.Chart(box_data).mark_boxplot().encode(
-				x=alt.X(key, title=key.capitalize()),
+				x=alt.X(key, title=key.capitalize(), sort=box_data.get_column(key).to_list()),
 				y=alt.Y('user_scored:Q', title='Score', scale=alt.Scale(domain=(0, 10))),
 				tooltip=[
 					alt.Tooltip(f'{key}:N', title=key.capitalize()),
