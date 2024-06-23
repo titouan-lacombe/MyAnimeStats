@@ -15,7 +15,7 @@ def weighted_mean(col, wh_col):
 def get_user_franchises(user_animes: pl.DataFrame):
 	# Fake franchises
 	user_animes = user_animes.with_columns(
-		franchise = pl.col("title"),
+		franchise = pl.col("title_english").fill_null(pl.col("title")),
 	)
 
 	# Default franchise
