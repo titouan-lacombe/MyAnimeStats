@@ -13,6 +13,11 @@ def weighted_mean(col, wh_col):
 	return ((pl.col(col) * pl.col(wh_col)).sum() / pl.col(wh_col).sum()).fill_nan(None).alias(col)
 
 def get_user_franchises(user_animes: pl.DataFrame):
+	# Fake franchises
+	user_animes = user_animes.with_columns(
+		franchise = pl.col("title"),
+	)
+
 	# Default franchise
 	lazy_user_animes = user_animes.lazy().with_columns(
 		pl.col("franchise").fill_null(pl.col("title")),

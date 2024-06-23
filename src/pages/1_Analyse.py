@@ -44,11 +44,11 @@ if st.button("Analyse"):
 			st.error(f"User '{user_name}' not found")
 			st.stop()
 	
-	st.write("## Favourite franchises")
-	st.dataframe(stats["favorite_franchises"])
-
 	st.write(f"## Air schedule (in {local_tz})")
 	st.dataframe(stats["air_schedule"])
+
+	st.write("## Favourite franchises")
+	st.dataframe(stats["favorite_franchises"])
 
 	col1, col2 = st.columns(2)
 
