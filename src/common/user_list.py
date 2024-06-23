@@ -75,7 +75,7 @@ class UserList:
 
 		# Parse dates
 		df = df.with_columns([
-			pl.col(col).str.to_date("%d-%m-%y")
+			pl.col(col).str.to_date(strict=False)
 			for col in ["user_watch_start", "user_watch_end"]
 		])
 
