@@ -128,17 +128,13 @@ if st.button("Launch analysis"):
 			# Removes filtered keys from the plot
 			key: pl.String
 		}).with_columns(
-			median_score=pl.col('user_scored').list.median()
-		).explode('user_scored').sort('median_score', key, descending=True)
+			mean_score=pl.col('user_scored').list.mean()
+		).explode('user_scored').sort('mean_score', key, descending=True)
 
 		col.altair_chart(
 			alt.Chart(box_data).mark_boxplot().encode(
 				x=alt.X(key, title=key.capitalize(), sort=box_data.get_column(key).to_list()),
 				y=alt.Y('user_scored:Q', title='Score', scale=alt.Scale(domain=(0, 10))),
-				tooltip=[
-					alt.Tooltip(f'{key}:N', title=key.capitalize()),
-					alt.Tooltip('user_scored:Q', title='Score')
-				],
 			).properties(
 				title=key.capitalize(),
 				width=800,
