@@ -132,7 +132,10 @@ if st.button("Analyse"):
 			alt.Chart(box_data).mark_boxplot().encode(
 				x=alt.X(key, title=key.capitalize()),
 				y=alt.Y('user_scored:Q', title='Score', scale=alt.Scale(domain=(0, 10))),
-				# tooltip='title_english:N'
+				tooltip=[
+					alt.Tooltip(f'{key}:N', title=key.capitalize()),
+					alt.Tooltip('user_scored:Q', title='Score')
+				],
 			).properties(
 				title=f'User Score Distribution by {key.capitalize()}',
 				width=800,
@@ -211,7 +214,7 @@ if st.button("Analyse"):
 	)
 
 	st.altair_chart(
-		alt.Chart(unpopular_data_colored.to_pandas()).mark_circle().encode(
+		alt.Chart(unpopular_data_colored).mark_circle().encode(
 			x=alt.X('scored_avg_scaled:Q', title='MyAnimeList Score'),
 			y=alt.Y('user_scored_scaled:Q', title='User Score'),
 			color=alt.Color('color:N', scale=None),
@@ -295,12 +298,14 @@ if st.button("Analyse"):
 		
 		# TODO format data into a matrix with lower triangle masked
 		st.altair_chart(
-			alt.Chart(occ_data.to_pandas()).mark_rect().encode(
+			alt.Chart(occ_data).mark_rect().encode(
 				x=alt.X('feature1:N', title='Feature 1'),
 				y=alt.Y('feature2:N', title='Feature 2'),
 				color=alt.Color('count:Q', title='Count'),
 				tooltip=[
-					alt.Tooltip('count:Q', title='Count')
+					alt.Tooltip('count:Q', title='Count'),
+					alt.Tooltip('feature1:N', title='Feature 1'),
+					alt.Tooltip('feature2:N', title='Feature 2')
 				]
 			).properties(
 				title=f"{feature.capitalize()} Co-occurrence Matrix",
