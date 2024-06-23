@@ -26,10 +26,11 @@ def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
 
 def get_stats(user_animes: pl.DataFrame, user_franchises: pl.DataFrame, user_tz: str):
 	user_animes = user_animes.lazy()
+	user_franchises = user_franchises.lazy()
 
 	# Get all lazy stats
 	lazy_stats = {
-		"favorite_franchises": user_franchises.lazy().sort("user_scored", descending=True, nulls_last=True).head(10),
+		"favorite_franchises": user_franchises.sort("user_scored", descending=True, nulls_last=True),
 		"air_schedule": Schedule.get(user_animes),
 		"next_releases": NextReleases.get(user_animes),
 	}

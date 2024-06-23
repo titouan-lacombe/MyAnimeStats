@@ -50,10 +50,12 @@ if st.button("Analyse"):
 	st.write(f"## Air schedule (in {local_tz})")
 	st.dataframe(stats["air_schedule"])
 
+	col1, col2 = st.columns(2)
+
 	# TODO title_localized: title_english or title_japanese
 	# # Histograms of 'score' and 'my_score'
 	# user_animes.hvplot.kde(y=['scored_avg', 'user_scored'], alpha=0.5, title='Franchises Score Distribution', legend='top_right', height=500, width=800, xlim=(0, 10)) +
-	st.altair_chart(
+	col1.altair_chart(
 		alt.Chart(
 			user_animes.filter(pl.col('scored_avg').is_not_null() & pl.col('user_scored').is_not_null())
 		).transform_fold(
@@ -77,7 +79,7 @@ if st.button("Analyse"):
 
 	# # Average user score by air year
 	# user_animes.hvplot.scatter(x='air_start', y='user_scored', title='User Score Distribution by Air Year', height=500, width=800, hover_cols=['title_english'])
-	st.altair_chart(
+	col2.altair_chart(
 		alt.Chart(user_animes).mark_point().encode(
 			x=alt.X('air_start:T', title='Air Year'),
 			y=alt.Y('user_scored:Q', title='Score', scale=alt.Scale(domain=(0, 10))),
@@ -115,7 +117,7 @@ if st.button("Analyse"):
 	# 	score_box_plot('themes'),
 	# 	score_box_plot('studios'),
 	# 	score_box_plot('demographics')
-	def score_box_plot(key: str):
+	def score_box_plot(key: str, col):
 		threshold = 8
 		box_data = user_animes.filter(
 			pl.col('user_scored').is_not_null()
@@ -128,7 +130,7 @@ if st.button("Analyse"):
 			median_score=pl.col('user_scored').list.median()
 		).explode('user_scored').sort('median_score', key, descending=True)
 
-		st.altair_chart(
+		col.altair_chart(
 			alt.Chart(box_data).mark_boxplot().encode(
 				x=alt.X(key, title=key.capitalize()),
 				y=alt.Y('user_scored:Q', title='Score', scale=alt.Scale(domain=(0, 10))),
@@ -143,10 +145,10 @@ if st.button("Analyse"):
 			)
 		)
 
-	score_box_plot('genres')
-	score_box_plot('themes')
-	score_box_plot('studios')
-	score_box_plot('demographics')
+	score_box_plot('genres', col1)
+	score_box_plot('themes', col2)
+	score_box_plot('studios', col1)
+	score_box_plot('demographics', col2)
 
 	# # Scale scores to remove bias in MAL users scoring and user scoring
 	# def scale_scores(col: str):
@@ -181,7 +183,9 @@ if st.button("Analyse"):
 	).sort("score_difference_abs", descending=True)
 
 	st.write("## Most unpopular opinions")
-	st.dataframe(unpopular_data.select("title_english", "score_difference", "scored_avg", "user_scored"))
+
+	col1, col2 = st.columns(2)
+	col1.dataframe(unpopular_data.select("title_english", "score_difference", "scored_avg", "user_scored"))
 
 	# normie_ness = 1 - (unpopular_data.get_column("score_difference_abs").mean() * 2)
 	# print(f"[green]Normie-ness: {normie_ness:.2%}[/green]")
@@ -213,7 +217,7 @@ if st.button("Analyse"):
 		)
 	)
 
-	st.altair_chart(
+	col2.altair_chart(
 		alt.Chart(unpopular_data_colored).mark_circle().encode(
 			x=alt.X('scored_avg_scaled:Q', title='MyAnimeList Score'),
 			y=alt.Y('user_scored_scaled:Q', title='User Score'),
@@ -292,12 +296,12 @@ if st.button("Analyse"):
 
 		return co_occurrence_counts
 	
-	def draw_co_occurrence(feature: str):
+	def draw_co_occurrence(feature: str, col):
 		"Draw a co-occurrence matrix with a title and masks the upper triangle."
 		occ_data = co_occurrence(user_animes.get_column(feature))
 		
 		# TODO format data into a matrix with lower triangle masked
-		st.altair_chart(
+		col.altair_chart(
 			alt.Chart(occ_data).mark_rect().encode(
 				x=alt.X('feature1:N', title='Feature 1'),
 				y=alt.Y('feature2:N', title='Feature 2'),
@@ -314,5 +318,6 @@ if st.button("Analyse"):
 			)
 		)
 
-	draw_co_occurrence('genres')
-	draw_co_occurrence('themes')
+	col1, col2 = st.columns(2)
+	draw_co_occurrence('genres', col1)
+	draw_co_occurrence('themes', col2)
