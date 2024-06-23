@@ -17,9 +17,9 @@ set_page_config(
 
 st.title("List Analysis")
 
-col1, col2, _ = st.columns([1, 1, 4])
+col1, _ = st.columns([1, 4])
 user_name = st.session_state.get("user_name", "")
-user_name = col1.text_input("Your MAL username", user_name)
+user_name = col1.text_input("Your MAL username:", user_name)
 st.session_state["user_name"] = user_name
 
 # Return timezone as string
