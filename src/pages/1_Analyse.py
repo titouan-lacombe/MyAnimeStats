@@ -45,10 +45,16 @@ if st.button("Analyse"):
 			st.stop()
 	
 	st.write(f"## Air schedule (in {local_tz})")
-	st.dataframe(stats["air_schedule"])
+	st.dataframe(
+		stats["air_schedule"],
+		hide_index=True,
+	)
 
 	st.write("## Favourite franchises")
-	st.dataframe(stats["favorite_franchises"])
+	st.dataframe(
+		stats["favorite_franchises"],
+		hide_index=True,
+	)
 
 	col1, col2 = st.columns(2)
 
@@ -185,7 +191,10 @@ if st.button("Analyse"):
 	st.write("## Most unpopular opinions")
 
 	col1, col2 = st.columns(2)
-	col1.dataframe(unpopular_data.select("title_localized", "score_difference", "scored_avg", "user_scored"))
+	col1.dataframe(
+		unpopular_data.select("title_localized", "score_difference", "scored_avg", "user_scored"),
+		hide_index=True,
+	)
 
 	# normie_ness = 1 - (unpopular_data.get_column("score_difference_abs").mean() * 2)
 	# print(f"[green]Normie-ness: {normie_ness:.2%}[/green]")
