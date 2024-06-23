@@ -17,12 +17,12 @@ st.title("Analyse")
 
 col1, col2, _ = st.columns([1, 1, 4])
 user_name = st.session_state.get("user_name", "")
-user_name = col1.text_input("MyAnimeList username", user_name)
+user_name = col1.text_input("Your MAL username", user_name)
 st.session_state["user_name"] = user_name
 
 # TODO get user timezone using js
 timezones = list(sorted(pytz.all_timezones))
-local_tz = col2.selectbox("Local timezone", timezones, index=timezones.index("UTC"))
+local_tz = col2.selectbox("Your timezone", timezones, index=timezones.index("UTC"))
 
 @st.cache_data(show_spinner=False)
 def analyse(user_name: str, local_tz: str):
