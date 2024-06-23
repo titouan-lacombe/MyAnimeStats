@@ -54,7 +54,9 @@ if st.button("Analyse"):
 	# # Histograms of 'score' and 'my_score'
 	# user_animes.hvplot.kde(y=['scored_avg', 'user_scored'], alpha=0.5, title='Franchises Score Distribution', legend='top_right', height=500, width=800, xlim=(0, 10)) +
 	st.altair_chart(
-		alt.Chart(user_animes).transform_fold(
+		alt.Chart(
+			user_animes.filter(pl.col('scored_avg').is_not_null() & pl.col('user_scored').is_not_null())
+		).transform_fold(
 			['scored_avg', 'user_scored'],
 			as_=['variable', 'value']
 		).transform_density(
