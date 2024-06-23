@@ -140,7 +140,7 @@ if st.button("Analyse"):
 				title=f'User Score Distribution by {key.capitalize()}',
 				width=800,
 				height=500
-			).interactive()
+			)
 		)
 
 	score_box_plot('genres')
@@ -311,7 +311,7 @@ if st.button("Analyse"):
 				title=f"{feature.capitalize()} Co-occurrence Matrix",
 				width=800,
 				height=800
-			).interactive()
+			)
 		)
 
 	draw_co_occurrence('genres')
