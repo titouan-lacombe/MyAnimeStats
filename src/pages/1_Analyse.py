@@ -42,7 +42,7 @@ if st.button("Analyse"):
 		try:
 			stats, user_franchises, user_animes = analyse(user_name, local_tz)
 		except UserNotFound:
-			st.error(f"User '{user_name}' not found")
+			st.error(f"User '{user_name}' not found (your list might be private)")
 			st.stop()
 	
 	st.write(f"## Air schedule (in {local_tz})")
