@@ -19,4 +19,7 @@ class NextReleases:
 			).dt.to_string(
 				"%A %d %B %Y at %H:%M"
 			)
-		).select("title_localized", "text")
+		).select("title_localized", "text").rename({
+			"title_localized": "Title",
+			"text": "Air Date",
+		})

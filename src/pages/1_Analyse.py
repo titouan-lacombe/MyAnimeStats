@@ -58,10 +58,7 @@ if st.button("Launch analysis"):
 	st.write("## Next releases")
 	st.write("What to look forward to?")
 	st.dataframe(
-		stats["next_releases"].rename({
-			"title_localized": "Title",
-			"text": "Air Date",
-		}),
+		stats["next_releases"],
 		hide_index=True,
 	)
 
