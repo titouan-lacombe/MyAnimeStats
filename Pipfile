@@ -11,6 +11,9 @@ streamlit = "*"
 altair = "*"
 
 [dev-packages]
+pandas = "*"
+ipykernel = "*"
+pyarrow = "*"
 
 [requires]
 python_version = "3.11"
