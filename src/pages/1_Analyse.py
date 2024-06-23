@@ -165,7 +165,12 @@ if st.button("Launch analysis"):
 	col1.write("## Most unpopular opinions")
 	col1.write("Do you have any hot takes?")
 	col1.dataframe(
-		unpopular_data.select("title_localized", "score_difference", "scored_avg", "user_scored"),
+		unpopular_data.select("title_localized", "score_difference", "scored_avg", "user_scored").rename({
+			"title_localized": "Title",
+			"score_difference": "Normed Score Diff (%)",
+			"scored_avg": "MyAnimeList Score",
+			"user_scored": "User Score"
+		}),
 		hide_index=True,
 		use_container_width=True,
 		height=700,
