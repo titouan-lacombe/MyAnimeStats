@@ -229,7 +229,7 @@ if st.button("Analyse"):
 		).properties(
 			title='User Score vs MyAnimeList Score',
 			width=800,
-			height=500
+			height=800
 		).interactive()
 	)
 
