@@ -167,9 +167,13 @@ if st.button("Launch analysis"):
 	col1.dataframe(
 		unpopular_data.select("title_localized", "score_difference", "scored_avg", "user_scored"),
 		hide_index=True,
+		use_container_width=True,
+		height=700,
 	)
 
 	normie_ness = 1 - (unpopular_data.get_column("score_difference_abs").mean() * 2)
+	st.write("## Normie-ness")
+	st.write("Higly scientific metric to measure how normie you are")
 	st.write(f"Normie-ness: {normie_ness:.2%}")
 
 	unpopular_data_colored = unpopular_data.with_columns(
