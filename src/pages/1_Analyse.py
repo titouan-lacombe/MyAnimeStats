@@ -74,7 +74,13 @@ if st.button("Analyse"):
 		).mark_area(opacity=0.5).encode(
 			x=alt.X('value:Q', title='Score'),
 			y=alt.Y('density:Q', title='Density'),
-			color='variable:N'
+			color=alt.Color(
+				'variable:N',
+				legend=alt.Legend(
+					title=None,
+					labelExpr="datum.label == 'scored_avg' ? 'MyAnimeList Score' : 'User Score'"
+				)
+			)
 		).properties(
 			title='Franchises Score Distribution',
 			width=800,
@@ -82,7 +88,6 @@ if st.button("Analyse"):
 		).interactive()
 	)
 
-	# # Average user score by air year
 	col2.altair_chart(
 		alt.Chart(user_animes).mark_point().encode(
 			x=alt.X('air_start:T', title='Air Year'),
