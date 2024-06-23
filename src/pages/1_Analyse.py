@@ -52,12 +52,12 @@ if st.button("Launch analysis"):
 		hide_index=True,
 	)
 
-	st.write("## Favourite franchises")
-	st.write("What do you like the most?")
-	st.dataframe(
-		stats["favorite_franchises"],
-		hide_index=True,
-	)
+	# st.write("## Favourite franchises")
+	# st.write("What do you like the most?")
+	# st.dataframe(
+	# 	stats["favorite_franchises"],
+	# 	hide_index=True,
+	# )
 
 	col1, col2 = st.columns(2)
 
