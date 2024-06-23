@@ -224,7 +224,9 @@ if st.button("Analyse"):
 			color=alt.Color('color:N', scale=None),
 			tooltip=[
 				alt.Tooltip('title_english:N', title='Title'),
-				alt.Tooltip('score_difference:Q', title='Score Difference')
+				alt.Tooltip('scored_avg:Q', title='MyAnimeList Score'),
+				alt.Tooltip('user_scored:Q', title='User Score'),
+				alt.Tooltip('score_difference:Q', title='Normed Score Diff (%)')
 			]
 		).properties(
 			title='User Score vs MyAnimeList Score',
