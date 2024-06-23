@@ -2,6 +2,7 @@ import httpx, pytz
 import altair as alt
 import streamlit as st
 import polars as pl
+from datetime import datetime
 from itertools import combinations
 from common.utils import set_page_config
 from common.filesystem import anime_db_path
@@ -25,12 +26,12 @@ timezones = list(sorted(pytz.all_timezones))
 local_tz = col2.selectbox("Your timezone", timezones, index=timezones.index("UTC"))
 
 @st.cache_data(show_spinner=False)
-def analyse(user_name: str, local_tz: str):
+def analyse(user_name: str, local_tz: str, now: datetime):
 	with httpx.Client() as client:
 		user_list = UserList.from_user_name(client, user_name)
 	user_animes = get_user_animes(user_list, anime_db_path)
 	user_franchises = get_user_franchises(user_animes)
-	stats = get_stats(user_animes, user_franchises, local_tz)
+	stats = get_stats(user_animes, user_franchises, local_tz, now)
 	return stats, user_franchises, user_animes
 
 if st.button("Launch analysis"):
@@ -38,9 +39,11 @@ if st.button("Launch analysis"):
 		st.error("Please provide your MyAnimeList username")
 		st.stop()
 
+	now = datetime.now()
+
 	with st.spinner("Working..."):
 		try:
-			stats, user_franchises, user_animes = analyse(user_name, local_tz)
+			stats, user_franchises, user_animes = analyse(user_name, local_tz, now)
 		except UserNotFound:
 			st.error(f"User '{user_name}' not found (your list might be private)")
 			st.stop()
@@ -49,6 +52,16 @@ if st.button("Launch analysis"):
 	st.write(f"Times are in {local_tz} timezone")
 	st.dataframe(
 		stats["air_schedule"],
+		hide_index=True,
+	)
+
+	st.write("## Next releases")
+	st.write("What to look forward to?")
+	st.dataframe(
+		stats["next_releases"].rename({
+			"title_localized": "Title",
+			"text": "Air Date",
+		}),
 		hide_index=True,
 	)
 

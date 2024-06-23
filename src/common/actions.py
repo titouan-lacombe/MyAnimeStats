@@ -1,6 +1,7 @@
 import logging
 import polars as pl
 from pathlib import Path
+from datetime import datetime
 from .schedule import Schedule
 from .next_releases import NextReleases
 
@@ -27,7 +28,7 @@ def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
 
 	return user_animes
 
-def get_stats(user_animes: pl.DataFrame, user_franchises: pl.DataFrame, user_tz: str):
+def get_stats(user_animes: pl.DataFrame, user_franchises: pl.DataFrame, user_tz: str, now: datetime):
 	user_animes = user_animes.lazy()
 	user_franchises = user_franchises.lazy()
 
@@ -35,7 +36,7 @@ def get_stats(user_animes: pl.DataFrame, user_franchises: pl.DataFrame, user_tz:
 	lazy_stats = {
 		"favorite_franchises": user_franchises.sort("user_scored", descending=True, nulls_last=True),
 		"air_schedule": Schedule.get(user_animes),
-		"next_releases": NextReleases.get(user_animes),
+		"next_releases": NextReleases.get(user_animes, user_tz, now),
 	}
 
 	# Collect all stats in parallel
