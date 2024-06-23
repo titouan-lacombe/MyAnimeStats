@@ -53,4 +53,12 @@ class Schedule:
 		for animes in schedule.values():
 			animes.sort(key=lambda x: x["datetime"])
 
-		return schedule
+		# Create a DataFrame with the schedule information
+		max_len = max(len(animes) for animes in schedule.values())
+		data = {day: [""] * max_len for day in WEEK_DAYS}
+		
+		for day, animes in schedule.items():
+			for i, anime in enumerate(animes):
+				data[day][i] = f"{anime['datetime'].strftime('%H:%M')} - {anime['title']}"
+		
+		return pl.DataFrame(data)

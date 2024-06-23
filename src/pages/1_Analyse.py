@@ -47,9 +47,8 @@ if st.button("Analyse"):
 	st.write("## Favourite franchises")
 	st.dataframe(stats["favorite_franchises"])
 
-	# TODO: fix rendering
-	# st.write("## Air schedule")
-	# st.table(stats["air_schedule"])
+	st.write(f"## Air schedule (in {local_tz})")
+	st.dataframe(stats["air_schedule"])
 
 	# TODO title_localized: title_english or title_japanese
 	# # Histograms of 'score' and 'my_score'
