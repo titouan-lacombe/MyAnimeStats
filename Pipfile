@@ -9,6 +9,7 @@ polars = "*"
 httpx = "*"
 streamlit = "*"
 altair = "*"
+streamlit-javascript = "*"
 
 [dev-packages]
 pandas = "*"

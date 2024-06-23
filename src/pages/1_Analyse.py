@@ -1,7 +1,8 @@
-import httpx, pytz
+import httpx
 import altair as alt
 import streamlit as st
 import polars as pl
+from streamlit_javascript import st_javascript
 from datetime import datetime
 from itertools import combinations
 from common.utils import set_page_config
@@ -21,9 +22,8 @@ user_name = st.session_state.get("user_name", "")
 user_name = col1.text_input("Your MAL username", user_name)
 st.session_state["user_name"] = user_name
 
-# TODO get user timezone using js
-timezones = list(sorted(pytz.all_timezones))
-local_tz = col2.selectbox("Your timezone", timezones, index=timezones.index("UTC"))
+# Return timezone as string
+local_tz = st_javascript("Intl.DateTimeFormat().resolvedOptions().timeZone")
 
 @st.cache_data(show_spinner=False)
 def analyse(user_name: str, local_tz: str, now: datetime):
