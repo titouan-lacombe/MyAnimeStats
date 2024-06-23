@@ -243,7 +243,7 @@ if st.button("Launch analysis"):
 	
 	def draw_co_occurrence(feature: str, col):
 		"Draw a co-occurrence matrix with a title and masks the upper triangle."
-		occ_data = co_occurrence(user_animes.get_column(feature))
+		occ_data = co_occurrence(user_animes.filter(pl.col(feature).is_not_null()).get_column(feature))
 		
 		# TODO format data into a matrix with lower triangle masked
 		col.altair_chart(
