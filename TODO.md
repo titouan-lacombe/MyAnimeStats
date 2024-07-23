@@ -1,17 +1,17 @@
-use scrapped database as new backend
+MyAnimeStats V3:
+- stats i could add:
+  - episodes watched (total time)
+  - franchises watched / franchises to watch (will need relational data if we want better stats)
+- pretty landing page
 
-refactor codebase:
-- use rich for logging
-- use oop
-- use polars
+MyAnimeStats V4:
+- If clustering:
+  - TF-IDF -> PCA -> UMAP -> HDBSCAN
+- If scraping:
+  - try to search better DB with staff/character/franchise data & better scraping
+  - add franchise stats (similar to V1)
+  - add staff stats (similar to V1) (will need either slow scraping or slow runtime data collection)
+  - make prettier frontend with d3.js? or other? (https://streamlit.io/ ?)
 
-convert data manip to JS? or intermediate data format sent to frontend?
-make graphs & frontend with d3.js? or other?
-
-build backend api with a real db?
-
-deploy to server (build & test locally)
-
-stats i could add:
- - episodes watched (total time)
- - franchises watched / franchises to watch (will need relational data if we want better stats)
+V5:
+- deploy to server (build & test locally) deploy with static compose, just pull
