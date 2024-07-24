@@ -56,6 +56,7 @@ if st.button("Launch analysis"):
 	st.dataframe(
 		stats["air_schedule"],
 		hide_index=True,
+		use_container_width=True,
 	)
 
 	st.write("## Next releases")
@@ -63,6 +64,7 @@ if st.button("Launch analysis"):
 	st.dataframe(
 		stats["next_releases"],
 		hide_index=True,
+		width=base_width,
 	)
 
 	# st.write("## Favourite franchises")
@@ -180,7 +182,7 @@ if st.button("Launch analysis"):
 			"user_scored": "User Score"
 		}),
 		hide_index=True,
-		use_container_width=True,
+		width=base_width,
 		height=base_width,
 	)
 
