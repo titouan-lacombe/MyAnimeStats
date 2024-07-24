@@ -17,6 +17,9 @@ set_page_config(
 
 st.title("List Analysis")
 
+base_width = 600
+base_height = 300
+
 col1, _ = st.columns([1, 4])
 user_name = st.session_state.get("user_name", "")
 user_name = col1.text_input("Your MAL username:", user_name)
@@ -96,8 +99,8 @@ if st.button("Launch analysis"):
 				)
 			)
 		).properties(
-			width=800,
-			height=500
+			width=base_width,
+			height=base_height
 		).interactive()
 	)
 
@@ -113,8 +116,8 @@ if st.button("Launch analysis"):
 				alt.Tooltip('air_start:T', title='Air Start')
 			]
 		).properties(
-			width=800,
-			height=500
+			width=base_width,
+			height=base_height
 		).interactive()
 	)
 
@@ -137,8 +140,8 @@ if st.button("Launch analysis"):
 				y=alt.Y('user_scored:Q', title='Score', scale=alt.Scale(domain=(0, 10))),
 			).properties(
 				title=key.capitalize(),
-				width=800,
-				height=500
+				width=base_width,
+				height=base_height + 150
 			)
 		)
 
@@ -178,7 +181,7 @@ if st.button("Launch analysis"):
 		}),
 		hide_index=True,
 		use_container_width=True,
-		height=700,
+		height=base_width,
 	)
 
 	normie_ness = 1 - (unpopular_data.get_column("score_difference_abs").mean() * 2)
@@ -209,8 +212,8 @@ if st.button("Launch analysis"):
 				alt.Tooltip('score_difference:Q', title='Normed Score Diff (%)')
 			]
 		).properties(
-			width=800,
-			height=800
+			width=base_width,
+			height=base_width
 		).interactive()
 	)
 
@@ -253,8 +256,8 @@ if st.button("Launch analysis"):
 				]
 			).properties(
 				title=feature.capitalize(),
-				width=800,
-				height=800
+				width=base_width,
+				height=base_width
 			)
 		)
 
