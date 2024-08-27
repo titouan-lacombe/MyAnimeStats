@@ -1,7 +1,7 @@
 import logging, httpx
 import polars as pl
 from io import TextIOWrapper
-from .models import UserStatus
+from .models import UserStatus, UserPriority
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class UserList:
 
 		# Convert status & priority to enums
 		df = df.with_columns(
-			user_watch_status = pl.col("user_watch_status").replace(STATUS_MAP).cast(pl.Enum(STATUS_MAP.values())),
+			user_watch_status = pl.col("user_watch_status").replace_strict(STATUS_MAP, return_dtype=pl.String).cast(pl.Enum(STATUS_MAP.values())),
 			user_priority = pl.col("user_priority").cast(pl.Enum([UserPriority.LOW, UserPriority.MEDIUM, UserPriority.HIGH])),
 		)
 
