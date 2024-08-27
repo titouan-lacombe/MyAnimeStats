@@ -1,5 +1,6 @@
 from datetime import time, datetime
 import polars as pl
+from .models import UserStatus, AirStatus
 
 class NextReleases:
 	def get(user_animes: pl.LazyFrame, user_tz: str, now: datetime):
@@ -7,8 +8,8 @@ class NextReleases:
 		animes_tz = "Asia/Tokyo"
 
 		return user_animes.filter(
-			(pl.col("user_watch_status") == "Plan to Watch")
-			& (pl.col("air_status") == "Not yet aired")
+			(pl.col("user_watch_status") == UserStatus.PLAN_TO_WATCH)
+			& (pl.col("air_status") == AirStatus.NOT_YET_AIRED)
 			& (pl.col("air_start").is_not_null())
 			& (pl.col("air_start").dt.date() >= now.date())
 		).sort("air_start", nulls_last=True).with_columns(

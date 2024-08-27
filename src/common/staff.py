@@ -3,6 +3,7 @@ from tqdm import tqdm
 
 from .cache import staff_cache, character_cache
 from .log import logger
+from .models import UserStatus
 
 log = logger.getChild(__name__)
 
@@ -27,7 +28,7 @@ async def get_staff(animes, score_min=8, position_blacklist=None, language_white
 
     # Filter animes by status and score
     def filter_anime(anime):
-        return anime["my_status"] != "Plan to Watch" and anime["my_score"] >= score_min
+        return anime["my_status"] != UserStatus.PLAN_TO_WATCH and anime["my_score"] >= score_min
     animes = [anime for anime in animes if filter_anime(anime)]
 
     persons = {}

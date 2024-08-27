@@ -1,13 +1,14 @@
 import pytz
 from datetime import datetime, time, timedelta
 import polars as pl
+from .models import UserStatus, AirStatus
 
 WEEK_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 class Schedule:
 	def get(user_animes: pl.LazyFrame):
 		return user_animes.filter(
-			(pl.col("user_watch_status") == "Watching") & (pl.col("air_status") == "Currently Airing")
+			(pl.col("user_watch_status") == UserStatus.WATCHING) & (pl.col("air_status") == AirStatus.CURRENTLY_AIRING)
 		).select(
 			"title_localized",
 			"air_day",

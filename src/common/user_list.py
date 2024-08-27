@@ -1,15 +1,16 @@
 import logging, httpx
 import polars as pl
 from io import TextIOWrapper
+from .models import UserStatus
 
 logger = logging.getLogger(__name__)
 
 STATUS_MAP = {
-	1: "Watching",
-	2: "Completed",
-	3: "On-Hold",
-	4: "Dropped",
-	6: "Plan to Watch",
+	1: UserStatus.WATCHING,
+	2: UserStatus.COMPLETED,
+	3: UserStatus.ON_HOLD,
+	4: UserStatus.DROPPED,
+	6: UserStatus.PLAN_TO_WATCH,
 }
 
 USER_LIST_SCHEMA = {
