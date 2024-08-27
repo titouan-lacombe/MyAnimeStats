@@ -71,7 +71,7 @@ class UserList:
 		# Convert status & priority to enums
 		df = df.with_columns(
 			user_watch_status = pl.col("user_watch_status").replace(STATUS_MAP).cast(pl.Enum(STATUS_MAP.values())),
-			user_priority = pl.col("user_priority").cast(pl.Enum(["Low", "Medium", "High"])),
+			user_priority = pl.col("user_priority").cast(pl.Enum([UserPriority.LOW, UserPriority.MEDIUM, UserPriority.HIGH])),
 		)
 
 		# Parse dates

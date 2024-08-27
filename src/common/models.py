@@ -9,3 +9,8 @@ class AirStatus:
 	CURRENTLY_AIRING = "Currently Airing"
 	NOT_YET_AIRED = "Not yet aired"
 	# FINISHED_AIRING = "Finished Airing" # TODO correct value
+
+class UserPriority:
+	HIGH = "High"
+	MEDIUM = "Medium"
+	LOW = "Low"
