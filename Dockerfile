@@ -4,11 +4,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-	pipenv inotify-tools \
+	inotify-tools \
 	# Install troubleshooting tools
 	vim htop curl \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir pipenv
 
 # Set the working directory
 WORKDIR /app
