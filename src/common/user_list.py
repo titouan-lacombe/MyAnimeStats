@@ -94,10 +94,18 @@ class UserList:
 		while True:
 			logger.info(f"Scraping web list with offset {total_entries}...")
 
-			response = http_client.get(f"https://myanimelist.net/animelist/{user}/load.json", params={
-				"offset": total_entries,
-				'status': 7, # All statuses
-			})
+			response = http_client.get(f"https://myanimelist.net/animelist/{user}/load.json", params=
+				{
+					"offset": total_entries,
+					'status': 7, # All statuses
+				},
+				timeout=httpx.Timeout(
+					connect=10,
+					pool=10,
+					write=10,
+					read=10,
+				)
+			)
 			if response.status_code == 400:
 				raise UserNotFound
 			response.raise_for_status()

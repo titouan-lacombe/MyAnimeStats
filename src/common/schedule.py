@@ -1,9 +1,11 @@
-import pytz
+import pytz, logging
 from datetime import datetime, time, timedelta
 import polars as pl
 from .models import UserStatus, AirStatus
 
 WEEK_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+logger = logging.getLogger(__name__)
 
 class Schedule:
 	def get(user_animes: pl.LazyFrame):
@@ -46,9 +48,16 @@ class Schedule:
 		# Build the schedule from the filtered animes
 		schedule = {day: [] for day in WEEK_DAYS}
 		for row in schedule_df.rows(named=True):
-			anime_tz = row.get("air_tz")
+			anime_tz = row["air_tz"]
+			anime_air_day = row["air_day"]
+			anime_air_time = row["air_time"]
 			anime_tz = anime_tz if anime_tz is not None else default_tz
-			dt: datetime = Schedule.get_dt(row["air_day"], row["air_time"], anime_tz, user_tz)
+
+			if anime_tz is None or anime_air_time is None or anime_air_day is None:
+				logger.warning(f"Couldn't build schedule entry: missing infos for {row['title_localized']}")
+				continue
+				
+			dt: datetime = Schedule.get_dt(anime_air_day, anime_air_time, anime_tz, user_tz)
 			air_day = dt.strftime("%A")
 			schedule[air_day].append({"title": row["title_localized"], "datetime": dt})
 		
