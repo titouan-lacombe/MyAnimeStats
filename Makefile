@@ -23,6 +23,9 @@ down:
 restart:
 	@$(COMPOSE) restart
 
+ps:
+	@$(COMPOSE) ps
+
 stats:
 	@$(COMPOSE) stats
 
