@@ -46,7 +46,9 @@ class Schedule:
 		# Build the schedule from the filtered animes
 		schedule = {day: [] for day in WEEK_DAYS}
 		for row in schedule_df.rows(named=True):
-			dt: datetime = Schedule.get_dt(row["air_day"], row["air_time"], row.get("air_tz", default_tz), user_tz)
+			anime_tz = row.get("air_tz")
+			anime_tz = anime_tz if anime_tz is not None else default_tz
+			dt: datetime = Schedule.get_dt(row["air_day"], row["air_time"], anime_tz, user_tz)
 			air_day = dt.strftime("%A")
 			schedule[air_day].append({"title": row["title_localized"], "datetime": dt})
 		
