@@ -8,14 +8,13 @@ pyarrow = "*"
 polars = "*"
 httpx = "*"
 streamlit = "*"
-altair = "*"
 streamlit-javascript = "*"
+altair = "*"
 pydantic = "*"
 
 [dev-packages]
 pandas = "*"
 ipykernel = "*"
-pyarrow = "*"
 
 [requires]
 python_version = "3.13"
