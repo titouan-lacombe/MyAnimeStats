@@ -2,24 +2,22 @@ FROM python:3.13-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-	inotify-tools \
-	# Install troubleshooting tools
+	# App dependencies
+	gosu inotify-tools \
+	# Troubleshooting tools
 	vim htop curl \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
-
-RUN pip install --no-cache-dir pipenv
 
 # Set the working directory
 WORKDIR /app
 
 # Install python packages
+RUN pip install --no-cache-dir pipenv
 COPY Pipfile Pipfile.lock ./
-RUN pipenv sync -v --system --clear && pipenv --clear
+RUN pipenv sync -v --system --clear && pip cache purge
 
-# Copy the current directory contents into the container at /app
 COPY src ./src
 
 # Streamlit configuration
@@ -27,4 +25,4 @@ RUN mkdir -p .streamlit
 COPY streamlit.toml .streamlit/config.toml
 
 # Run the application
-CMD [ "streamlit", "run", "src/MyAnimeStats.py" ]
+CMD [ "/app/src/entrypoint.sh" ]
