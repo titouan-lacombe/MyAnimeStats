@@ -136,8 +136,13 @@ if st.button("Launch analysis"):
 
     col2.write("## User score distribution by air year")
     col2.write("Are you biased towards newer animes?")
-    col2.altair_chart(
-        alt.Chart(user_animes)
+
+    points = (
+        alt.Chart(
+            user_animes.filter(
+                pl.col("user_scored").is_not_null() & pl.col("air_start").is_not_null()
+            )
+        )
         .mark_point()
         .encode(
             x=alt.X("air_start:T", title="Air Year"),
@@ -151,6 +156,12 @@ if st.button("Launch analysis"):
         .properties(width=base_width, height=base_height)
         .interactive()
     )
+
+    tendency_line = points.transform_regression(
+        "air_start", "user_scored", method="linear"
+    ).mark_line(color="red", opacity=0.8)
+
+    col2.altair_chart(points + tendency_line)
 
     def score_box_plot(key: str, col):
         threshold = 8
