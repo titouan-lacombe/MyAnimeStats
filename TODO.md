@@ -1,6 +1,7 @@
 MyAnimeStats V3:
 - stats i could add:
   - episodes watched (total time)
+  - episodes to watch (total time) + ratio
   - franchises watched / franchises to watch (will need relational data if we want better stats)
 - pretty landing page
 
