@@ -3,7 +3,7 @@ import altair as alt
 import streamlit as st
 import polars as pl
 from streamlit_javascript import st_javascript
-from datetime import datetime
+from datetime import datetime, timedelta
 from itertools import combinations
 from common.utils import set_page_config
 from common.filesystem import anime_db_path
@@ -75,6 +75,30 @@ if st.button("Launch analysis"):
     # 	stats["favorite_franchises"],
     # 	hide_index=True,
     # )
+
+    # Compute all watched episodes
+    watched_duration: timedelta = (
+        user_animes.filter(pl.col("user_watch_episodes").is_not_null())
+        .select(pl.col("user_watch_episodes") * pl.col("episode_avg_duration"))
+        .sum()
+        .item()
+    )
+    to_watch_duration: timedelta = (
+        user_animes.select(
+            pl.max_horizontal(pl.col("episodes"), pl.col("user_watch_episodes"))
+            * pl.col("episode_avg_duration")
+        )
+        .sum()
+        .item()
+    )
+
+    st.write("## Watched episodes")
+    st.write(
+        f"You have watched {watched_duration.total_seconds() / 3600:.1f} hours of anime out of {to_watch_duration.total_seconds() / 3600:.1f} hours (planned to watch + unfinished)"
+    )
+    st.write(
+        f"You have watched {watched_duration / to_watch_duration:.1%} of the anime you want to watch"
+    )
 
     col1, col2 = st.columns(2)
 
