@@ -1,6 +1,7 @@
 from os import getenv
 from pydantic import BaseModel
 
+
 class Config(BaseModel):
     @classmethod
     def from_env(cls, **overrides):
@@ -17,7 +18,9 @@ class Config(BaseModel):
 
         return cls(**build_args)
 
+
 class AppConfig(Config):
     allow_import: bool = False
+
 
 config = AppConfig.from_env()
