@@ -1,5 +1,6 @@
 import logging
 from os import getenv
+
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)

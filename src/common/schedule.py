@@ -1,7 +1,10 @@
-import pytz, logging
+import logging
 from datetime import datetime, time, timedelta
+
 import polars as pl
-from .models import UserStatus, AirStatus
+import pytz
+
+from .models import AirStatus, UserStatus
 
 WEEK_DAYS = [
     "Monday",
@@ -85,8 +88,8 @@ class Schedule:
 
         for day, animes in schedule.items():
             for i, anime in enumerate(animes):
-                data[day][
-                    i
-                ] = f"{anime['datetime'].strftime('%H:%M')} - {anime['title']}"
+                data[day][i] = (
+                    f"{anime['datetime'].strftime('%H:%M')} - {anime['title']}"
+                )
 
         return pl.DataFrame(data)

@@ -1,7 +1,8 @@
 from urllib.parse import quote
+
 from tqdm import tqdm
 
-from .cache import staff_cache, character_cache
+from .cache import character_cache, staff_cache
 from .log import logger
 from .models import UserStatus
 

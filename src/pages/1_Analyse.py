@@ -1,15 +1,17 @@
-import httpx
-import altair as alt
-import streamlit as st
-import polars as pl
-from streamlit_javascript import st_javascript
 from datetime import datetime, timedelta
 from itertools import combinations
-from common.utils import set_page_config
+
+import altair as alt
+import httpx
+import polars as pl
+import streamlit as st
+from streamlit_javascript import st_javascript
+
+from common.actions import get_stats, get_user_animes
 from common.filesystem import anime_db_path
-from common.user_list import UserList, UserNotFound
 from common.franchises import get_user_franchises
-from common.actions import get_user_animes, get_stats
+from common.user_list import UserList, UserNotFound
+from common.utils import set_page_config
 
 set_page_config(
     layout="wide",
@@ -53,7 +55,7 @@ if st.button("Launch analysis"):
             st.error(f"User '{user_name}' not found (your list might be private)")
             st.stop()
 
-    st.write(f"## Current air schedule")
+    st.write("## Current air schedule")
     st.write(f"Times are in {local_tz} timezone")
     st.dataframe(
         stats["air_schedule"],

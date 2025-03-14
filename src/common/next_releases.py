@@ -1,6 +1,8 @@
-from datetime import time, datetime
+from datetime import datetime, time
+
 import polars as pl
-from .models import UserStatus, AirStatus
+
+from .models import AirStatus, UserStatus
 
 
 class NextReleases:

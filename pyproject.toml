@@ -1,0 +1,16 @@
+[project]
+name = "myanimestats"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+	"pyarrow",
+	"polars",
+	"httpx",
+	"streamlit",
+	"streamlit-javascript",
+	"altair",
+	"pydantic",
+]
+
+[project.optional-dependencies]
+dev = ["ipykernel"]

@@ -1,7 +1,10 @@
-import logging, httpx
-import polars as pl
+import logging
 from io import TextIOWrapper
-from .models import UserStatus, UserPriority
+
+import httpx
+import polars as pl
+
+from .models import UserPriority, UserStatus
 
 logger = logging.getLogger(__name__)
 

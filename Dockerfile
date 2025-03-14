@@ -14,9 +14,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Install python packages
-RUN pip install --no-cache-dir pipenv
-COPY Pipfile Pipfile.lock ./
-RUN pipenv sync -v --system --clear && pip cache purge
+COPY pyproject.toml uv.lock ./
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
+RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
+	--mount=type=cache,target=/root/.cache/uv \
+	uv sync --locked --compile-bytecode --no-build --no-install-project
 
 COPY src ./src
 

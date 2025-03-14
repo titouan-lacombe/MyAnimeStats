@@ -1,4 +1,5 @@
 from os import getenv
+
 from pydantic import BaseModel
 
 

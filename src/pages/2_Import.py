@@ -1,10 +1,11 @@
+from typing import List
+
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
-from typing import List
+
+from common.config import config
 from common.filesystem import datasets
 from common.utils import set_page_config
-from common.config import config
-
 
 set_page_config(
     layout="wide",

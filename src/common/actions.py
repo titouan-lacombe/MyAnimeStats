@@ -1,9 +1,11 @@
 import logging
-import polars as pl
-from pathlib import Path
 from datetime import datetime
-from .schedule import Schedule
+from pathlib import Path
+
+import polars as pl
+
 from .next_releases import NextReleases
+from .schedule import Schedule
 
 logger = logging.getLogger(__name__)
 
