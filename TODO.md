@@ -1,4 +1,5 @@
 MyAnimeStats V3:
+- use scoring system instead of just "score average" or "number in list" (scoring system is parameter, possible values: "score average", "number in list", "score median", "score exponential")
 - stats i could add:
   - franchises watched / franchises to watch (will need relational data if we want better stats)
 - pretty landing page
