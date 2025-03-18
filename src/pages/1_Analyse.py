@@ -1,3 +1,4 @@
+import io
 from datetime import datetime, timedelta
 from itertools import combinations
 
@@ -54,6 +55,16 @@ if st.button("Launch analysis"):
         except UserNotFound:
             st.error(f"User '{user_name}' not found (your list might be private)")
             st.stop()
+
+    st.write("## Download your data")
+    st.write("Download your data to analyse it offline")
+    buffer = io.BytesIO()
+    user_animes.write_parquet(buffer)
+    st.download_button(
+        label="Download data",
+        data=buffer.getvalue(),
+        file_name=f"{user_name}.parquet",
+    )
 
     st.write("## Current air schedule")
     st.write(f"Times are in {local_tz} timezone")
