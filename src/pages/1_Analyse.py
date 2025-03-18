@@ -171,7 +171,9 @@ if st.button("Launch analysis"):
     )
 
     tendency_line = points.transform_regression(
-        "air_start", "user_scored", method="linear"
+        "air_start",
+        "user_scored",
+        method="linear",
     ).mark_line(color="red", opacity=0.8)
 
     col2.altair_chart(points + tendency_line)
@@ -279,7 +281,7 @@ if st.button("Launch analysis"):
     col2.write(
         "Do you agree with the general public? Or are you going against the flow?"
     )
-    col2.altair_chart(
+    points = (
         alt.Chart(unpopular_data_colored)
         .mark_circle()
         .encode(
@@ -296,6 +298,16 @@ if st.button("Launch analysis"):
         .properties(width=base_width, height=base_width)
         .interactive()
     )
+
+    # TODO Debug
+    # tendency_line = points.transform_regression(
+    #     "scored_avg_scaled",
+    #     "user_scored_scaled",
+    #     method="linear",
+    # ).mark_line(color="blue", opacity=0.8)
+
+    # col2.altair_chart(points + tendency_line)
+    col2.altair_chart(points)
 
     def co_occurrence(data: pl.Series) -> pl.DataFrame:
         "Compute co-occurrence data from a list of lists."
