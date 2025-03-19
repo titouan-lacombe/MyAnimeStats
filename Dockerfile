@@ -18,7 +18,7 @@ COPY pyproject.toml uv.lock ./
 ENV UV_PROJECT_ENVIRONMENT=/usr/local
 RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
 	--mount=type=cache,target=/root/.cache/uv \
-	uv sync --locked --compile-bytecode --no-build --no-install-project
+	uv sync --locked --compile-bytecode --no-build --no-install-project --link-mode copy
 
 COPY src ./src
 
