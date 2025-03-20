@@ -10,6 +10,7 @@ dependencies = [
 	"streamlit-javascript",
 	"altair",
 	"pydantic",
+	"pydantic-settings>=2.8.1",
 ]
 
 [project.optional-dependencies]
