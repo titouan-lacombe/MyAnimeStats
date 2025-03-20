@@ -6,6 +6,8 @@ services:
     restart: always
     environment:
       TZ: Europe/Paris
+      PUID: $PUID
+      PGID: $PGID
       LOG_LEVEL: DEBUG
       ALLOW_IMPORT: "true"
     volumes:

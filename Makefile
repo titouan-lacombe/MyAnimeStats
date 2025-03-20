@@ -1,5 +1,10 @@
 COMPOSE=docker compose
 
+PUID=$(shell id -u)
+PGID=$(shell id -g)
+
+export
+
 default: up
 
 mkdata:
