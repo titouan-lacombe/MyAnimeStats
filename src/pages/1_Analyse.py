@@ -131,7 +131,7 @@ if st.button("Launch analysis"):
             as_=["value", "density"],
             extent=[0, 10],
         )
-        .mark_area(opacity=0.5)
+        .mark_line()
         .encode(
             x=alt.X("value:Q", title="Score"),
             y=alt.Y("density:Q", title="Density"),
