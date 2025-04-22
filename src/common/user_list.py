@@ -110,7 +110,9 @@ class UserList:
         mal_chunk_size = 300
 
         total_entries = 0
-        df = pl.DataFrame()
+        df = pl.DataFrame(
+            schema=USER_LIST_SCHEMA,
+        )
 
         while True:
             logger.info(f"Scraping web list with offset {total_entries}...")
@@ -138,7 +140,12 @@ class UserList:
             total_entries += new_entries
 
             # Append the new entries to the dataframe
-            df = df.vstack(pl.DataFrame(entries))
+            df = df.vstack(
+                pl.DataFrame(
+                    entries,
+                    schema=USER_LIST_SCHEMA,
+                ),
+            )
 
             # Check if we're done
             if new_entries < mal_chunk_size:
