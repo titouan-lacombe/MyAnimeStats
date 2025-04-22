@@ -34,7 +34,9 @@ local_tz = st_javascript("Intl.DateTimeFormat().resolvedOptions().timeZone")
 
 @st.cache_data(show_spinner=False)
 def analyse(user_name: str, local_tz: str, now: datetime):
-    with httpx.Client() as client:
+    with httpx.Client(
+        timeout=httpx.Timeout(30),
+    ) as client:
         user_list = UserList.from_user_name(client, user_name)
     user_animes = get_user_animes(user_list, anime_db_path)
     user_franchises = get_user_franchises(user_animes)
