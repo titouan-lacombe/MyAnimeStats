@@ -7,7 +7,7 @@ if ! id "app" &>/dev/null; then
   PGID=${PGID:-1000}
   echo "=== Creating user app ${PUID}:${PGID} ==="
   groupadd app -g ${PGID}
-  useradd app -u ${PUID} -g app
+  useradd app -m -u ${PUID} -g app
   chown -R app:app .
 fi
 
