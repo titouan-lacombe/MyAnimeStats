@@ -22,8 +22,18 @@ logger = logging.getLogger(__name__)
 class Schedule:
     def get(user_animes: pl.LazyFrame):
         return user_animes.filter(
-            (pl.col("user_watch_status") == UserStatus.WATCHING)
-            & (pl.col("air_status") == AirStatus.CURRENTLY_AIRING)
+            (
+                pl.col("user_watch_status").is_in(
+                    [UserStatus.WATCHING, UserStatus.PLAN_TO_WATCH]
+                )
+            )
+            & (
+                pl.col("air_status").is_in(
+                    [AirStatus.CURRENTLY_AIRING, AirStatus.NOT_YET_AIRED]
+                )
+            )
+            & (pl.col("air_day").is_not_null())
+            & (pl.col("air_time").is_not_null())
         ).select(
             "title_localized",
             "air_day",
