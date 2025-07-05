@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime
 
 import polars as pl
 
@@ -9,22 +9,16 @@ class NextReleases:
     @staticmethod
     def get(user_animes: pl.LazyFrame, user_time: datetime):
         # Patch since all animes are in JST (later we will use air_tz)
-        animes_tz = "Asia/Tokyo"
-
         return (
             user_animes.filter(
                 (pl.col("user_watch_status") == UserStatus.PLAN_TO_WATCH)
                 & (pl.col("air_status") == AirStatus.NOT_YET_AIRED)
-                & (pl.col("air_start").is_not_null())
-                & (pl.col("air_start").dt.date() >= user_time.date())
+                & (pl.col("air_start_dt").is_not_null())
+                & (pl.col("air_start_dt") >= user_time)
             )
-            .sort("air_start", nulls_last=True)
+            .sort("air_start_dt")
             .with_columns(
-                text=pl.col("air_start")
-                .dt.combine(pl.col("air_time").replace(None, time(0, 0)))
-                .dt.replace_time_zone(animes_tz)
-                .dt.convert_time_zone(str(user_time.tzinfo))
-                .dt.to_string("%A %d %B %Y at %H:%M")
+                text=pl.col("air_start_dt").dt.to_string("%A %d %B %Y at %H:%M")
             )
             .select("title_localized", "text")
             .rename(

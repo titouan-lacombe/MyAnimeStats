@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 
 class Schedule:
     @staticmethod
-    def get(user_animes: pl.LazyFrame):
-        # TODO filter not yet aired to max 7 days
+    def get(user_animes: pl.LazyFrame, user_time: datetime):
+        next_week = user_time + timedelta(days=7)
         return user_animes.filter(
             (
                 pl.col("user_watch_status").is_in(
@@ -36,6 +36,7 @@ class Schedule:
             )
             & (pl.col("air_day").is_not_null())
             & (pl.col("air_time").is_not_null())
+            & (pl.col("air_start_dt") < next_week)
         ).select(
             "title_localized",
             "air_day",
@@ -67,12 +68,7 @@ class Schedule:
     # Finish building the schedule with the user timezone
     @staticmethod
     def from_df(schedule_df: pl.DataFrame, user_time: datetime):
-        default_tz = "Asia/Tokyo"
-
         # Sort the schedule by day and time
-        schedule_df = schedule_df.sort("air_day", "air_time").with_columns(
-            air_tz=pl.col("air_tz").fill_null(default_tz)
-        )
         start_of_week = user_time.date() - timedelta(days=user_time.weekday())
 
         # Build the schedule
@@ -99,6 +95,10 @@ class Schedule:
             )
             air_day = dt.strftime("%A")
             schedule[air_day].append({"title": row["title_localized"], "datetime": dt})
+
+        # Sort the schedule by day and time
+        for day in WEEK_DAYS:
+            schedule[day] = sorted(schedule[day], key=lambda x: x["datetime"])
 
         # Create a DataFrame with the schedule information
         max_len = max(len(animes) for animes in schedule.values())

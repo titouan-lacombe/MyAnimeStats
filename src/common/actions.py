@@ -1,6 +1,7 @@
 import logging
-from datetime import datetime
+from datetime import datetime, time
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import polars as pl
 
@@ -41,7 +42,33 @@ def get_stats(
     user_franchises: pl.DataFrame,
     user_time: datetime,
 ):
-    user_animes = user_animes.lazy()
+    default_tz = "Asia/Tokyo"
+
+    def get_aware_dt(row: str):
+        dt, tz = row.split("\t")
+        return (
+            datetime.fromisoformat(dt)
+            .replace(tzinfo=ZoneInfo(tz))
+            .astimezone(user_time.tzinfo)
+        )
+
+    user_animes = (
+        user_animes.lazy()
+        .with_columns(
+            air_tz=pl.col("air_tz").fill_null(default_tz),
+        )
+        .with_columns(
+            air_start_dt=(
+                pl.col("air_start")
+                .dt.combine(pl.col("air_time").replace(None, time(0, 0)))
+                .dt.to_string()
+                + "\t"
+                + pl.col("air_tz")
+            ).map_elements(
+                get_aware_dt, return_dtype=pl.Datetime("us", str(user_time.tzinfo))
+            )
+        )
+    )
     user_franchises = user_franchises.lazy()
 
     # Get all lazy stats
@@ -49,7 +76,7 @@ def get_stats(
         "favorite_franchises": user_franchises.sort(
             "user_scored", descending=True, nulls_last=True
         ),
-        "air_schedule": Schedule.get(user_animes),
+        "air_schedule": Schedule.get(user_animes, user_time),
         "next_releases": NextReleases.get(user_animes, user_time),
     }
 
