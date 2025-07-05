@@ -39,6 +39,7 @@ class UserNotFound(Exception):
 
 
 class UserList:
+    @staticmethod
     def clean(df: pl.LazyFrame) -> pl.LazyFrame:
         # Cast to the correct types & select only the necessary columns
         df = df.select(USER_LIST_SCHEMA.keys()).cast(USER_LIST_SCHEMA)
@@ -94,15 +95,14 @@ class UserList:
         )
 
         # Parse dates
-        df = df.with_columns(
+        return df.with_columns(
             [
                 pl.col(col).str.to_date(strict=False)
                 for col in ["user_watch_start", "user_watch_end"]
             ]
         )
 
-        return df
-
+    @staticmethod
     def from_user_name(http_client: httpx.Client, user: str):
         "Scrapes the user's anime list from the web"
 
@@ -158,6 +158,7 @@ class UserList:
         cleaned: pl.DataFrame = UserList.clean(df.lazy()).collect()
         return cleaned
 
+    @staticmethod
     def from_xml(file: TextIOWrapper) -> pl.DataFrame:
         "Loads the user's anime list from a MAL XML export file"
         # TODO: Implement from_xml

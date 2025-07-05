@@ -6,6 +6,7 @@ from .models import AirStatus, UserStatus
 
 
 class NextReleases:
+    @staticmethod
     def get(user_animes: pl.LazyFrame, user_tz: str, now: datetime):
         # Patch since all animes are in JST (later we will use air_tz)
         animes_tz = "Asia/Tokyo"

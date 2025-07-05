@@ -1,5 +1,3 @@
-from typing import List
-
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
@@ -14,9 +12,9 @@ set_page_config(
 st.title("MAL Datasets Importer")
 
 
-def import_files(files: List[UploadedFile]):
-    uploaded_names = set([file.name for file in files])
-    expected_names = set([file.name for file in datasets])
+def import_files(files: list[UploadedFile]):
+    uploaded_names = {file.name for file in files}
+    expected_names = {file.name for file in datasets}
 
     # Check if there are any unexpected files
     unexpected_files = uploaded_names - expected_names

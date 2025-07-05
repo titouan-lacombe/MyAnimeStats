@@ -329,13 +329,12 @@ if st.button("Launch analysis"):
         )
 
         # Count co-occurrences
-        co_occurrence_counts = (
+        return (
             df.group_by(["feature1", "feature2"])
             .agg(pl.len().alias("count"))
             .sort("count", descending=True)
         )
 
-        return co_occurrence_counts
 
     def draw_co_occurrence(feature: str, col):
         "Draw a co-occurrence matrix with a title and masks the upper triangle."

@@ -14,7 +14,7 @@ class Config(BaseModel):
     @classmethod
     def from_env(cls):
         env_args = {}
-        for key in cls.model_fields.keys():
+        for key in cls.model_fields:
             env_val = getenv(key.upper())
             if env_val is not None:
                 env_args[key] = env_val

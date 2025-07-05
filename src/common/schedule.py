@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class Schedule:
+    @staticmethod
     def get(user_animes: pl.LazyFrame):
         return user_animes.filter(
             (
@@ -41,6 +42,7 @@ class Schedule:
             "air_tz",
         )
 
+    @staticmethod
     def get_dt(week_day: str, time: time, from_tz_str: str, to_tz_str: str):
         "Get the datetime for the given week day and time in the user's timezone"
 
@@ -65,6 +67,7 @@ class Schedule:
         return air_at.astimezone(to_tz)
 
     # Finish building the schedule with the user timezone
+    @staticmethod
     def from_df(schedule_df: pl.DataFrame, user_tz: str):
         default_tz = "Asia/Tokyo"
 

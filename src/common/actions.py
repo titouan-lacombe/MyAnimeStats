@@ -57,7 +57,7 @@ def get_stats(
     # Collect all stats in parallel
     stats_order = list(lazy_stats.keys())
     collected_stats = pl.collect_all([lazy_stats[stat] for stat in stats_order])
-    stats = {name: collected for name, collected in zip(stats_order, collected_stats)}
+    stats = dict(zip(stats_order, collected_stats, strict=False))
 
     # Finish building the schedule
     stats["air_schedule"] = Schedule.from_df(stats["air_schedule"], user_tz)

@@ -15,3 +15,21 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["ipykernel"]
+
+[tool.ruff.lint]
+extend-select = [
+    "UP",     # pyupgrade
+    "I",      # isort
+    "PERF",   # perflint
+    "N",      # Naming conventions
+    "FLY",    # flynt
+    "PTH",    # pathlib
+    "TC",     # type check
+    "SIM",    # simplify
+    "RET",    # return
+    "FIX",    # fix & todos
+    "C4",     # flake8-comprehensions
+    "B",      # flake8-bugbear
+    "ASYNC",  # async
+    "ANN001", # Type annotations
+]

@@ -1,12 +1,6 @@
 from urllib.parse import quote
 
-from tqdm import tqdm
-
-from .cache import character_cache, staff_cache
-from .log import logger
 from .models import UserStatus
-
-log = logger.getChild(__name__)
 
 default_position_blacklist = [
     "ADR Director",  # Doesn't matter if watching in Japanese
@@ -22,7 +16,10 @@ default_language_whitelist = [
 
 # Recover all person that worked on watched animes
 async def get_staff(
-    animes, score_min=8, position_blacklist=None, language_whitelist=None
+    animes,
+    score_min=8,
+    position_blacklist=None,
+    language_whitelist=None,
 ):
     if position_blacklist is None:
         position_blacklist = default_position_blacklist
@@ -109,14 +106,12 @@ def sort_staff(persons: list):
         person["score"] = 0
 
         # TODO use franchise instead of anime
-        character_animes = set(
-            [
-                anime["mal_id"]
-                for character in person["characters"]
-                for anime in character["animes"]
-            ]
-        )
-        animes = set([anime["anime"]["mal_id"] for anime in person["animes"]])
+        character_animes = {
+            anime["mal_id"]
+            for character in person["characters"]
+            for anime in character["animes"]
+        }
+        animes = {anime["anime"]["mal_id"] for anime in person["animes"]}
         animes.update(character_animes)
 
         def score_anime(anime):
