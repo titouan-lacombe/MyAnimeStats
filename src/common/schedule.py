@@ -1,8 +1,8 @@
 import logging
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 import polars as pl
-import pytz
 
 from .models import AirStatus, UserStatus
 
@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 class Schedule:
     @staticmethod
     def get(user_animes: pl.LazyFrame):
+        # TODO filter not yet aired to max 7 days
         return user_animes.filter(
             (
                 pl.col("user_watch_status").is_in(
@@ -43,41 +44,45 @@ class Schedule:
         )
 
     @staticmethod
-    def get_dt(week_day: str, time: time, from_tz_str: str, to_tz_str: str):
+    def get_dt(
+        start_of_week: date,
+        week_day: str,
+        time: time,
+        from_tz: ZoneInfo,
+        to_tz: ZoneInfo,
+    ):
         "Get the datetime for the given week day and time in the user's timezone"
-
-        to_tz = pytz.timezone(to_tz_str)
-        from_tz = pytz.timezone(from_tz_str)
-
-        # Get start of the week
-        now = datetime.now(from_tz)
-        start_of_week = now.date() - timedelta(days=now.weekday())
 
         # Get the day and time
         day_num = WEEK_DAYS.index(week_day)
-        air_at = datetime.combine(start_of_week + timedelta(days=day_num), time)
-
-        # Localize the datetime to the JST timezone
-        air_at = from_tz.localize(air_at)
-
-        # Normalize the datetime to handle daylight saving time transitions
-        air_at = from_tz.normalize(air_at)
+        air_at = datetime.combine(
+            start_of_week + timedelta(days=day_num),
+            time,
+            from_tz,
+        )
 
         # Convert the datetime to the local timezone
         return air_at.astimezone(to_tz)
 
     # Finish building the schedule with the user timezone
     @staticmethod
-    def from_df(schedule_df: pl.DataFrame, user_tz: str):
+    def from_df(schedule_df: pl.DataFrame, user_time: datetime):
         default_tz = "Asia/Tokyo"
 
-        # Build the schedule from the filtered animes
+        # Sort the schedule by day and time
+        schedule_df = schedule_df.sort("air_day", "air_time").with_columns(
+            air_tz=pl.col("air_tz").fill_null(default_tz)
+        )
+        start_of_week = user_time.date() - timedelta(days=user_time.weekday())
+
+        # Build the schedule
         schedule = {day: [] for day in WEEK_DAYS}
         for row in schedule_df.rows(named=True):
-            anime_tz = row["air_tz"]
+            anime_tz = ZoneInfo(row["air_tz"])
             anime_air_day = row["air_day"]
             anime_air_time = row["air_time"]
-            anime_tz = anime_tz if anime_tz is not None else default_tz
+
+            # TODO id air day is null, use air_start.date().weekday()
 
             if anime_tz is None or anime_air_time is None or anime_air_day is None:
                 logger.warning(
@@ -86,14 +91,14 @@ class Schedule:
                 continue
 
             dt: datetime = Schedule.get_dt(
-                anime_air_day, anime_air_time, anime_tz, user_tz
+                start_of_week,
+                anime_air_day,
+                anime_air_time,
+                anime_tz,
+                user_time.tzinfo,
             )
             air_day = dt.strftime("%A")
             schedule[air_day].append({"title": row["title_localized"], "datetime": dt})
-
-        # Sort the schedule days by time of airing
-        for animes in schedule.values():
-            animes.sort(key=lambda x: x["datetime"])
 
         # Create a DataFrame with the schedule information
         max_len = max(len(animes) for animes in schedule.values())

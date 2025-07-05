@@ -39,8 +39,7 @@ def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
 def get_stats(
     user_animes: pl.DataFrame,
     user_franchises: pl.DataFrame,
-    user_tz: str,
-    now: datetime,
+    user_time: datetime,
 ):
     user_animes = user_animes.lazy()
     user_franchises = user_franchises.lazy()
@@ -51,7 +50,7 @@ def get_stats(
             "user_scored", descending=True, nulls_last=True
         ),
         "air_schedule": Schedule.get(user_animes),
-        "next_releases": NextReleases.get(user_animes, user_tz, now),
+        "next_releases": NextReleases.get(user_animes, user_time),
     }
 
     # Collect all stats in parallel
@@ -60,6 +59,6 @@ def get_stats(
     stats = dict(zip(stats_order, collected_stats, strict=False))
 
     # Finish building the schedule
-    stats["air_schedule"] = Schedule.from_df(stats["air_schedule"], user_tz)
+    stats["air_schedule"] = Schedule.from_df(stats["air_schedule"], user_time)
 
     return stats

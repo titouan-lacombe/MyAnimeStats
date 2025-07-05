@@ -1,6 +1,7 @@
 import io
 from datetime import datetime, timedelta
 from itertools import combinations
+from zoneinfo import ZoneInfo
 
 import altair as alt
 import httpx
@@ -23,24 +24,34 @@ st.title("List Analysis")
 base_width = 600
 base_height = 300
 
+# Get user name
 col1, _ = st.columns([1, 4])
 user_name = st.session_state.get("user_name", "")
 user_name = col1.text_input("Your MAL username:", user_name)
 st.session_state["user_name"] = user_name
 
-# Return timezone as string
-local_tz = st_javascript("Intl.DateTimeFormat().resolvedOptions().timeZone")
+# Get user time
+result = st_javascript(
+    "[new Date().toISOString(), Intl.DateTimeFormat().resolvedOptions().timeZone]",
+    "user_time_detector",
+)
+if isinstance(result, list):
+    user_iso_time, user_tz_name = result
+else:
+    # Fake data
+    user_iso_time, user_tz_name = "2020-01-01", "Asia/Tokyo"
+user_time = datetime.fromisoformat(user_iso_time).astimezone(ZoneInfo(user_tz_name))
 
 
 @st.cache_data(show_spinner=False)
-def analyse(user_name: str, local_tz: str, now: datetime):
+def analyse(user_name: str, user_time: datetime):
     with httpx.Client(
         timeout=httpx.Timeout(30),
     ) as client:
         user_list = UserList.from_user_name(client, user_name)
     user_animes = get_user_animes(user_list, anime_db_path)
     user_franchises = get_user_franchises(user_animes)
-    stats = get_stats(user_animes, user_franchises, local_tz, now)
+    stats = get_stats(user_animes, user_franchises, user_time)
     return stats, user_franchises, user_animes
 
 
@@ -49,11 +60,9 @@ if st.button("Launch analysis"):
         st.error("Please provide your MyAnimeList username")
         st.stop()
 
-    now = datetime.now()
-
     with st.spinner("Working..."):
         try:
-            stats, user_franchises, user_animes = analyse(user_name, local_tz, now)
+            stats, user_franchises, user_animes = analyse(user_name, user_time)
         except UserNotFound:
             st.error(f"User '{user_name}' not found (your list might be private)")
             st.stop()
@@ -69,7 +78,7 @@ if st.button("Launch analysis"):
     )
 
     st.write("## Current air schedule")
-    st.write(f"Times are in {local_tz} timezone")
+    st.write(f"Times are in {str(user_time.tzinfo)} timezone")
     st.dataframe(
         stats["air_schedule"],
         hide_index=True,
@@ -334,7 +343,6 @@ if st.button("Launch analysis"):
             .agg(pl.len().alias("count"))
             .sort("count", descending=True)
         )
-
 
     def draw_co_occurrence(feature: str, col):
         "Draw a co-occurrence matrix with a title and masks the upper triangle."
