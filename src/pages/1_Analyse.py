@@ -7,6 +7,7 @@ import altair as alt
 import httpx
 import polars as pl
 import streamlit as st
+from streamlit.delta_generator import DeltaGenerator
 from streamlit_javascript import st_javascript
 
 from common.actions import get_stats, get_user_animes
@@ -189,7 +190,7 @@ if st.button("Launch analysis"):
 
     col2.altair_chart(points + tendency_line)
 
-    def score_box_plot(key: str, col):
+    def score_box_plot(key: str, col: DeltaGenerator):
         threshold = 8
         box_data = (
             user_animes.filter(pl.col("user_scored").is_not_null())
@@ -344,7 +345,7 @@ if st.button("Launch analysis"):
             .sort("count", descending=True)
         )
 
-    def draw_co_occurrence(feature: str, col):
+    def draw_co_occurrence(feature: str, col: DeltaGenerator):
         "Draw a co-occurrence matrix with a title and masks the upper triangle."
         occ_data = co_occurrence(
             user_animes.filter(pl.col(feature).is_not_null()).get_column(feature)
