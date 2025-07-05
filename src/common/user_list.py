@@ -34,7 +34,7 @@ USER_LIST_SCHEMA = {
 }
 
 
-class UserNotFound(Exception):
+class UserNotFoundError(Exception):
     pass
 
 
@@ -131,7 +131,7 @@ class UserList:
                 ),
             )
             if response.status_code == 400:
-                raise UserNotFound
+                raise UserNotFoundError
             response.raise_for_status()
             entries = response.json()
 

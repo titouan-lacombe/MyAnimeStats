@@ -13,7 +13,7 @@ from streamlit_javascript import st_javascript
 from common.actions import get_stats, get_user_animes
 from common.filesystem import anime_db_path
 from common.franchises import get_user_franchises
-from common.user_list import UserList, UserNotFound
+from common.user_list import UserList, UserNotFoundError
 from common.utils import set_page_config
 
 set_page_config(
@@ -64,7 +64,7 @@ if st.button("Launch analysis"):
     with st.spinner("Working..."):
         try:
             stats, user_franchises, user_animes = analyse(user_name, user_time)
-        except UserNotFound:
+        except UserNotFoundError:
             st.error(f"User '{user_name}' not found (your list might be private)")
             st.stop()
 

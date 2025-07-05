@@ -1,19 +1,19 @@
 import polars as pl
 
 
-def first(col):
+def first(col: str):
     return pl.col(col).first().alias(col)
 
 
-def union(col):
+def union(col: str):
     return pl.col(col).flatten().unique().alias(col)
 
 
-def sum(col):
+def sum(col: str):
     return pl.col(col).sum().alias(col)
 
 
-def weighted_mean(col, wh_col):
+def weighted_mean(col: str, wh_col: str):
     return (
         ((pl.col(col) * pl.col(wh_col)).sum() / pl.col(wh_col).sum())
         .fill_nan(None)
