@@ -1,5 +1,5 @@
 import logging
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import polars as pl
@@ -42,28 +42,8 @@ class Schedule:
             "air_day",
             "air_time",
             "air_tz",
+            "air_start_dt",
         )
-
-    @staticmethod
-    def get_dt(
-        start_of_week: date,
-        week_day: str,
-        time: time,
-        from_tz: ZoneInfo,
-        to_tz: ZoneInfo,
-    ):
-        "Get the datetime for the given week day and time in the user's timezone"
-
-        # Get the day and time
-        day_num = WEEK_DAYS.index(week_day)
-        air_at = datetime.combine(
-            start_of_week + timedelta(days=day_num),
-            time,
-            from_tz,
-        )
-
-        # Convert the datetime to the local timezone
-        return air_at.astimezone(to_tz)
 
     # Finish building the schedule with the user timezone
     @staticmethod
@@ -72,41 +52,39 @@ class Schedule:
         start_of_week = user_time.date() - timedelta(days=user_time.weekday())
 
         # Build the schedule
-        schedule = {day: [] for day in WEEK_DAYS}
+        schedule = [[] for _ in range(len(WEEK_DAYS))]
         for row in schedule_df.rows(named=True):
-            anime_tz = ZoneInfo(row["air_tz"])
-            anime_air_day = row["air_day"]
-            anime_air_time = row["air_time"]
+            anime_air_day = WEEK_DAYS.index(row["air_day"])
 
-            # TODO id air day is null, use air_start.date().weekday()
+            if anime_air_day is None:
+                anime_air_start_dt: datetime = row["air_start_dt"]
+                anime_air_day = anime_air_start_dt.date().weekday()
 
-            if anime_tz is None or anime_air_time is None or anime_air_day is None:
-                logger.warning(
-                    f"Couldn't build schedule entry: missing infos for {row['title_localized']}"
-                )
-                continue
-
-            dt: datetime = Schedule.get_dt(
-                start_of_week,
-                anime_air_day,
-                anime_air_time,
-                anime_tz,
-                user_time.tzinfo,
+            # Compute the next airing datetime
+            air_at = datetime.combine(
+                start_of_week + timedelta(days=anime_air_day),
+                row["air_time"],
+                ZoneInfo(row["air_tz"]),
             )
-            air_day = dt.strftime("%A")
-            schedule[air_day].append({"title": row["title_localized"], "datetime": dt})
+
+            # Convert the datetime to user's timezone
+            air_at = air_at.astimezone(user_time.tzinfo)
+
+            schedule[air_at.date().weekday()].append(
+                {"title": row["title_localized"], "datetime": air_at}
+            )
 
         # Sort the schedule by day and time
-        for day in WEEK_DAYS:
-            schedule[day] = sorted(schedule[day], key=lambda x: x["datetime"])
+        schedule = [sorted(animes, key=lambda x: x["datetime"]) for animes in schedule]
 
         # Create a DataFrame with the schedule information
-        max_len = max(len(animes) for animes in schedule.values())
+        max_len = max(len(animes) for animes in schedule)
         data = {day: [""] * max_len for day in WEEK_DAYS}
 
-        for day, animes in schedule.items():
-            for i, anime in enumerate(animes):
-                data[day][i] = (
+        for i, animes in enumerate(schedule):
+            day = WEEK_DAYS[i]
+            for j, anime in enumerate(animes):
+                data[day][j] = (
                     f"{anime['datetime'].strftime('%H:%M')} - {anime['title']}"
                 )
 
