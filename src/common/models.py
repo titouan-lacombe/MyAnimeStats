@@ -9,7 +9,7 @@ class UserStatus:
 class AirStatus:
     CURRENTLY_AIRING = "Currently Airing"
     NOT_YET_AIRED = "Not yet aired"
-    # FINISHED_AIRING = "Finished Airing" # TODO correct value
+    FINISHED_AIRING = "Finished Airing"
 
 
 class UserPriority:
