@@ -42,32 +42,8 @@ def get_stats(
     user_franchises: pl.DataFrame,
     user_time: datetime,
 ):
-    default_tz = "Asia/Tokyo"
-
-    def get_aware_dt(row: str):
-        dt, tz = row.split("\t")
-        return (
-            datetime.fromisoformat(dt)
-            .replace(tzinfo=ZoneInfo(tz))
-            .astimezone(user_time.tzinfo)
-        )
-
-    user_animes = (
-        user_animes.lazy()
-        .with_columns(
-            air_tz=pl.col("air_tz").fill_null(default_tz),
-        )
-        .with_columns(
-            air_start_dt=(
-                pl.col("air_start")
-                .dt.combine(pl.col("air_time").replace(None, time(0, 0)))
-                .dt.to_string()
-                + "\t"
-                + pl.col("air_tz")
-            ).map_elements(
-                get_aware_dt, return_dtype=pl.Datetime("us", str(user_time.tzinfo))
-            )
-        )
+    user_animes = user_animes.lazy().with_columns(
+        pl.col("air_start_dt").dt.convert_time_zone(str(user_time.tzinfo))
     )
     user_franchises = user_franchises.lazy()
 
