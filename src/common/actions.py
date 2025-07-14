@@ -29,6 +29,7 @@ def get_user_animes(
         lang_col = f"title_{lang}"
         if lang_col not in user_list.columns:
             logger.warning(f"Language {lang} not found in database")
+            continue
 
         title_expr = title_expr.fill_null(pl.col(lang_col))
 
