@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 import polars as pl
@@ -34,8 +34,6 @@ class Schedule:
                     [AirStatus.CURRENTLY_AIRING, AirStatus.NOT_YET_AIRED]
                 )
             )
-            & (pl.col("air_day").is_not_null())
-            & (pl.col("air_time").is_not_null())
             & (pl.col("air_start_dt") < next_week)
         ).select(
             "title_localized",
@@ -54,21 +52,22 @@ class Schedule:
         # Build the schedule
         schedule = [[] for _ in range(len(WEEK_DAYS))]
         for row in schedule_df.rows(named=True):
-            anime_air_day = WEEK_DAYS.index(row["air_day"])
+            anime_air_day = row["air_day"]
 
             if anime_air_day is None:
-                anime_air_start_dt: datetime = row["air_start_dt"]
-                anime_air_day = anime_air_start_dt.date().weekday()
+                air_at: datetime = row["air_start_dt"]
+            else:
+                anime_air_day = WEEK_DAYS.index(anime_air_day)
 
-            # Compute the next airing datetime
-            air_at = datetime.combine(
-                start_of_week + timedelta(days=anime_air_day),
-                row["air_time"],
-                ZoneInfo(row["air_tz"]),
-            )
+                # Compute the next airing datetime
+                air_at = datetime.combine(
+                    start_of_week + timedelta(days=anime_air_day),
+                    row["air_time"] or time(0, 0),
+                    ZoneInfo(row["air_tz"]),
+                )
 
-            # Convert the datetime to user's timezone
-            air_at = air_at.astimezone(user_time.tzinfo)
+                # Convert the datetime to user's timezone
+                air_at = air_at.astimezone(user_time.tzinfo)
 
             schedule[air_at.date().weekday()].append(
                 {"title": row["title_localized"], "datetime": air_at}

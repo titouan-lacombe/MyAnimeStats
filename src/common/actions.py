@@ -1,7 +1,6 @@
 import logging
-from datetime import datetime, time
+from datetime import datetime
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 import polars as pl
 
@@ -42,8 +41,9 @@ def get_stats(
     user_franchises: pl.DataFrame,
     user_time: datetime,
 ):
-    user_animes = user_animes.lazy().with_columns(
-        pl.col("air_start_dt").dt.convert_time_zone(str(user_time.tzinfo))
+    user_animes_lazy = user_animes.lazy().with_columns(
+        pl.col("air_start_dt").dt.convert_time_zone(str(user_time.tzinfo)),
+        pl.col("air_end_dt").dt.convert_time_zone(str(user_time.tzinfo)),
     )
     user_franchises = user_franchises.lazy()
 
@@ -52,8 +52,8 @@ def get_stats(
         "favorite_franchises": user_franchises.sort(
             "user_scored", descending=True, nulls_last=True
         ),
-        "air_schedule": Schedule.get(user_animes, user_time),
-        "next_releases": NextReleases.get(user_animes, user_time),
+        "air_schedule": Schedule.get(user_animes_lazy, user_time),
+        "next_releases": NextReleases.get(user_animes_lazy, user_time),
     }
 
     # Collect all stats in parallel

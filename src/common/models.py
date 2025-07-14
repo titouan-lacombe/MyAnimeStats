@@ -16,3 +16,12 @@ class UserPriority:
     HIGH = "High"
     MEDIUM = "Medium"
     LOW = "Low"
+
+
+class AnimeType:
+    TV = "TV"
+    MOVIE = "Movie"
+    OVA = "OVA"
+    ONA = "ONA"
+    SPECIAL = "Special"
+    TV_SPECIAL = "TV Special"
