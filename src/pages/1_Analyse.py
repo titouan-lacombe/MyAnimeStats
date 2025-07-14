@@ -31,26 +31,29 @@ user_name = st.session_state.get("user_name", "")
 user_name = col1.text_input("Your MAL username:", user_name)
 st.session_state["user_name"] = user_name
 
-# Get user time
-result = st_javascript(
-    "[new Date().toISOString(), Intl.DateTimeFormat().resolvedOptions().timeZone]",
+# Get user infos
+user_infos = st_javascript(
+    "[new Date().toISOString(), Intl.DateTimeFormat().resolvedOptions().timeZone, navigator.languages]",
     "user_time_detector",
 )
-if isinstance(result, list):
-    user_iso_time, user_tz_name = result
+if isinstance(user_infos, list):
+    user_iso_time, user_tz_name, user_langs = user_infos
 else:
     # Fake data
-    user_iso_time, user_tz_name = "2020-01-01", "Asia/Tokyo"
+    user_iso_time, user_tz_name, user_langs = "2020-01-01", "Asia/Tokyo", ["en-US"]
 user_time = datetime.fromisoformat(user_iso_time).astimezone(ZoneInfo(user_tz_name))
+
+# st.write(f"User time: {user_time}")
+# st.write(f"User lang: {user_langs}")
 
 
 @st.cache_data(show_spinner=False)
-def analyse(user_name: str, user_time: datetime):
+def analyse(user_name: str, user_time: datetime, user_langs: list[str]):
     with httpx.Client(
         timeout=httpx.Timeout(30),
     ) as client:
         user_list = UserList.from_user_name(client, user_name)
-    user_animes = get_user_animes(user_list, anime_db_path)
+    user_animes = get_user_animes(user_list, anime_db_path, user_langs)
     user_franchises = get_user_franchises(user_animes)
     stats = get_stats(user_animes, user_franchises, user_time)
     return stats, user_franchises, user_animes
@@ -63,7 +66,12 @@ if st.button("Launch analysis"):
 
     with st.spinner("Working..."):
         try:
-            stats, user_franchises, user_animes = analyse(user_name, user_time)
+            stats, user_franchises, user_animes = analyse(
+                user_name,
+                user_time,
+                user_langs,
+            )
+            user_animes: pl.DataFrame  # type annotation
         except UserNotFoundError:
             st.error(f"User '{user_name}' not found (your list might be private)")
             st.stop()
@@ -127,7 +135,6 @@ if st.button("Launch analysis"):
 
     col1, col2 = st.columns(2)
 
-    # TODO title_localized: title_english or title_japanese
     col1.write("## Franchises score distribution")
     col1.write("How do you score anime compared to the MAL users?")
     col1.altair_chart(
@@ -173,7 +180,7 @@ if st.button("Launch analysis"):
             x=alt.X("air_start:T", title="Air Year"),
             y=alt.Y("user_scored:Q", title="Score", scale=alt.Scale(domain=(0, 10))),
             tooltip=[
-                alt.Tooltip("title_localized:N", title="Title"),
+                alt.Tooltip("title:N", title="Title"),
                 alt.Tooltip("user_scored:Q", title="Score"),
                 alt.Tooltip("air_start:T", title="Air Start"),
             ],
@@ -257,15 +264,16 @@ if st.button("Launch analysis"):
         .sort("score_difference_abs", descending=True)
     )
 
+    # TODO option to compute mal popularity from mal scores or mal members (select box)
     col1, col2 = st.columns(2)
     col1.write("## Most unpopular opinions")
     col1.write("Do you have any hot takes?")
     col1.dataframe(
         unpopular_data.select(
-            "title_localized", "score_difference", "scored_avg", "user_scored"
+            "title", "score_difference", "scored_avg", "user_scored"
         ).rename(
             {
-                "title_localized": "Title",
+                "title": "Title",
                 "score_difference": "Normed Score Diff (%)",
                 "scored_avg": "MyAnimeList Score",
                 "user_scored": "User Score",
@@ -301,7 +309,7 @@ if st.button("Launch analysis"):
             y=alt.Y("user_scored_scaled:Q", title="User Score"),
             color=alt.Color("color:N", scale=None),
             tooltip=[
-                alt.Tooltip("title_localized:N", title="Title"),
+                alt.Tooltip("title:N", title="Title"),
                 alt.Tooltip("scored_avg:Q", title="MyAnimeList Score"),
                 alt.Tooltip("user_scored:Q", title="User Score"),
                 alt.Tooltip("score_difference:Q", title="Normed Score Diff (%)"),

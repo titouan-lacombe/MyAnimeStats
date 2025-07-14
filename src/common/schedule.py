@@ -36,7 +36,7 @@ class Schedule:
             )
             & (pl.col("air_start_dt") < next_week)
         ).select(
-            "title_localized",
+            "title",
             "air_day",
             "air_time",
             "air_tz",
@@ -70,7 +70,7 @@ class Schedule:
                 air_at = air_at.astimezone(user_time.tzinfo)
 
             schedule[air_at.date().weekday()].append(
-                {"title": row["title_localized"], "datetime": air_at}
+                {"title": row["title"], "datetime": air_at}
             )
 
         # Sort the schedule by day and time

@@ -10,20 +10,34 @@ from .schedule import Schedule
 logger = logging.getLogger(__name__)
 
 
-def get_user_animes(user_list: pl.DataFrame, anime_db_file: Path):
+def get_user_animes(
+    user_list: pl.DataFrame,
+    anime_db_file: Path,
+    user_langs: list[str],
+):
     anime_db = pl.scan_parquet(anime_db_file).cast(
         {
             "anime_id": pl.UInt64,
         }
     )
 
+    title_expr = pl.lit(None)
+    for lang in user_langs:
+        if "-" in lang:
+            lang = lang.split("-")[0]
+
+        lang_col = f"title_{lang}"
+        if lang_col not in user_list.columns:
+            logger.warning(f"Language {lang} not found in database")
+
+        title_expr = title_expr.fill_null(pl.col(lang_col))
+
+    title_expr = title_expr.fill_null(pl.col("title_default")).alias("title")
+
     user_animes = (
         user_list.lazy()
         .join(anime_db, on="anime_id", how="inner", validate="1:1")
-        .with_columns(
-            # TODO better handling of localized titles
-            title_localized=pl.col("title_english").fill_null(pl.col("title")),
-        )
+        .with_columns(title_expr)
         .collect()
     )
 

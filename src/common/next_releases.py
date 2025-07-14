@@ -20,10 +20,10 @@ class NextReleases:
             .with_columns(
                 text=pl.col("air_start_dt").dt.to_string("%A %d %B %Y at %H:%M")
             )
-            .select("title_localized", "text")
+            .select("title", "text")
             .rename(
                 {
-                    "title_localized": "Title",
+                    "title": "Title",
                     "text": "Air Date",
                 }
             )

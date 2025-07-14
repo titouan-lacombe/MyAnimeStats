@@ -40,7 +40,7 @@ class UserNotFoundError(Exception):
 
 class UserList:
     @staticmethod
-    def clean(df: pl.LazyFrame) -> pl.LazyFrame:
+    def clean(df: pl.LazyFrame):
         # Cast to the correct types & select only the necessary columns
         df = df.select(USER_LIST_SCHEMA.keys()).cast(USER_LIST_SCHEMA)
 
@@ -154,9 +154,7 @@ class UserList:
                 )
                 break
 
-        df.rechunk()
-        cleaned: pl.DataFrame = UserList.clean(df.lazy()).collect()
-        return cleaned
+        return UserList.clean(df.rechunk().lazy()).collect()
 
     @staticmethod
     def from_xml(file: TextIOWrapper) -> pl.DataFrame:
