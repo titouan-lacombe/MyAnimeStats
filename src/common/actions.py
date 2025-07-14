@@ -20,6 +20,7 @@ def get_user_animes(
             "anime_id": pl.UInt64,
         }
     )
+    anime_db_schema = anime_db.collect_schema()
 
     title_expr = pl.lit(None)
     for lang in user_langs:
@@ -27,7 +28,7 @@ def get_user_animes(
             lang = lang.split("-")[0]
 
         lang_col = f"title_{lang}"
-        if lang_col not in user_list.columns:
+        if lang_col not in anime_db_schema.names():
             logger.warning(f"Language {lang} not found in database")
             continue
 
